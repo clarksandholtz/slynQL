@@ -6,6 +6,7 @@
 - Run prisma deploy and choose local (Make sure you have docker installed before this step!!)
 - Run yarn dev (or npm start ) to deploy the server locally
 - yarn dev will open an in browser graphql playground where if you prefer graphiql desktop version you can use that instead
+- to open a mysql terminal to inspect the database run docker exec -it prisma-db mysql -u root --host 127.0.0.1 --port 3306 --password=graphcool
 
 <h1 align="center"><strong>Advanced GraphQL Node Server</strong></h1>
 
