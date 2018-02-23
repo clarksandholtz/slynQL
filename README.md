@@ -7,14 +7,12 @@
 - Run yarn dev (or npm start ) to deploy the server locally
 - yarn dev will open an in browser graphql playground where if you prefer graphiql desktop version you can use that instead
 
-<h1 align="center"><strong>Boilerplate for an Advanced GraphQL Server</strong></h1>
+<h1 align="center"><strong>Advanced GraphQL Node Server</strong></h1>
 
 <br />
 
 ![](https://imgur.com/lIi4YrZ.png)
 
-<div align="center"><strong>🚀 Bootstrap your GraphQL server within seconds</strong></div>
-<div align="center">Advanced starter kit for a flexible GraphQL server for Node.js - based on best practices from the GraphQL community.</div>
 
 ## Features
 
@@ -27,29 +25,6 @@
 - **Realtime updates**: Support for GraphQL subscriptions (_coming soon_)
 
 For a fully-fledged **GraphQL & Node.js tutorial**, visit [How to GraphQL](https://www.howtographql.com/graphql-js/0-introduction/). You can more learn about the idea behind GraphQL boilerplates [here](https://blog.graph.cool/graphql-boilerplates-graphql-create-how-to-setup-a-graphql-project-6428be2f3a5).
-
-## Requirements
-
-You need to have the [GraphQL CLI](https://github.com/graphql-cli/graphql-cli) installed to bootstrap your GraphQL server using `graphql create`:
-
-```sh
-npm install -g graphql-cli
-```
-
-## Getting started
-
-```sh
-# 1. Bootstrap GraphQL server in directory `my-app`, based on `node-advanced` boilerplate
-graphql create my-app --boilerplate node-advanced
-
-# 2. When prompted, deploy the Prisma service to a _public cluster_
-
-# 3. Navigate to the new project
-cd my-app
-
-# 4. Start server (runs on http://localhost:4000) and open GraphQL Playground
-yarn dev
-```
 
 ![](https://imgur.com/hElq68i.png)
 
@@ -82,8 +57,3 @@ yarn dev
 | `　　└── generated` (_directory_) | _Contains generated files_ |
 | `　　　　└── prisma.grapghql` | The **Prisma database schema** defining the Prisma GraphQL API  |
 
-## Contributing
-
-The GraphQL boilerplates are maintained by the GraphQL community, with official support from the [Apollo](https://dev-blog.apollodata.com) & [Graphcool](https://blog.graph.cool/) teams.
-
-Your feedback is **very helpful**, please share your opinion and thoughts! If you have any questions or want to contribute yourself, join the [`#graphql-boilerplate`](https://graphcool.slack.com/messages/graphql-boilerplate) channel on our [Slack](https://graphcool.slack.com/).
