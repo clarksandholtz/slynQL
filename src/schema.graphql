@@ -7,6 +7,9 @@ type Query {
 type Mutation {
   signup(name: String!, phone: String!, email: String!, uid: String!): AuthPayload!
   login(email: String!, uid: String!): AuthPayload!
+  createMessage(address: String!, body: String!, read: Boolean!, threadId: Int!, date: DateTime, error: Int!): Message!
+  updateMessage(read: Boolean, error: Int): Message!
+  deleteMessage(id: ID!): Message!
 }
 
 type AuthPayload {
