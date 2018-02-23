@@ -1,3 +1,12 @@
+<h1 align="center"><strong>New to the project?</strong></h1>
+
+- [Install Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
+- Install prisma with npm i -g prisma
+- Run npm install
+- Run prisma deploy and choose local (Make sure you have docker installed before this step!!)
+- Run yarn dev (or npm start ) to deploy the server locally
+- yarn dev will open an in browser graphql playground where if you prefer graphiql desktop version you can use that instead
+
 <h1 align="center"><strong>Boilerplate for an Advanced GraphQL Server</strong></h1>
 
 <br />
