@@ -1,0 +1,43 @@
+type File @model {
+  contentType: String!
+  createdAt: DateTime!
+  id: ID! @unique
+  name: String!
+  secret: String! @unique
+  size: Int!
+  updatedAt: DateTime!
+  url: String! @unique
+}
+
+type User @model {
+  createdAt: DateTime!
+  id: ID! @unique
+  name: String!
+  email: String! @unique
+  uid: String!
+  phone: String! @unique
+  updatedAt: DateTime!
+  conversations: [Conversation!]! @relation(name: "UsersConversation")
+}
+
+type Conversation @model {
+  id: ID! @unique
+  messages: [Message!]! @relation(name: "MessagesInConversation")
+  user: User @relation(name: "UsersConversation")
+  threadId: Int!
+}
+
+type Message @model {
+  read: Boolean!
+  id: ID! @unique
+  threadId: Int!
+  error: Int!
+  body: String!
+  date: DateTime
+  address: String!
+  conversation: Conversation @relation(name: "MessagesInConversation")
+}
+
+type Notification @model {
+  id: ID! @unique
+}
