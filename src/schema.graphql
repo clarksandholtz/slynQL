@@ -1,15 +1,19 @@
 # import User, Conversation, Message, Notification from './generated/prisma.graphql'
 
 type Query {
+  allConversations: [Conversation]
   me: User
 }
 
 type Mutation {
   signup(name: String!, phone: String!, email: String!, uid: String!): AuthPayload!
   login(email: String!, uid: String!): AuthPayload!
-  createMessage(address: String!, body: String!, read: Boolean!, threadId: Int!, date: DateTime, error: Int!): Message!
-  updateMessage(read: Boolean, error: Int): Message!
+
+  createMessage(address: String!, body: String!, read: Boolean!, threadId: Int!, date: DateTime, error: Boolean!): Message!
+  updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
   deleteMessage(id: ID!): Message!
+
+  deleteConversation(id: ID!): Conversation!
 }
 
 type AuthPayload {

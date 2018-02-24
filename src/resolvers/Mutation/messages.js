@@ -3,10 +3,9 @@ const { getUserId } = require('../../utils')
 const messages = {
   async createMessage(parent, args, ctx, info) {
     // Authorize the user and query it to add the message to
-    const user = await ctx.db.query.user({ where: { id: getUserId(ctx) } })
+    const userId = getUserId(ctx)
     // See if the user already has a conversation
-    let conversation = await ctx.db.query.conversations( {where: {threadId: args.threadId, user: {id: user.id}}})
-    console.log(conversation)
+    let conversation = await ctx.db.query.conversations( {where: {threadId: args.threadId, user: {id: userId}}})
     // if not create a new conversation for the user
     if(conversation.length == 0) { 
       conversation = await ctx.db.mutation.createConversation( {
@@ -14,7 +13,7 @@ const messages = {
           threadId: args.threadId, 
           user: {
             connect: {
-              id: user.id
+              id: userId
             }
           } 
         }
@@ -40,11 +39,28 @@ const messages = {
   },
 
   async updateMessage(parent, args, ctx, info) {
-    throw new Error(`Function not implemented yet`)
+    getUserId(ctx) // authorize
+    return await ctx.db.mutation.updateMessage({
+      data:{
+        read: args.read,
+        error: args.error
+      },
+      where:{
+        id: args.id
+      }
+    })
   },
 
   async deleteMessage(parent, args, ctx, info) {
-    throw new Error(`Function not implemented yet`)
+    const userId = getUserId(ctx)
+    const message = await ctx.db.query.message({ where:{ id: args.id } })
+    // Check to see if conversation is empty, if it is then delete it
+    let conversation = await ctx.db.query.conversations( {where: {threadId: message.threadId, user: {id: userId}}})
+    conversation = conversation[0]
+    if( !('messages' in conversation) ){ // conversation is empty
+      ctx.db.mutation.deleteConversation({ where: { id: conversation.id } })
+    }
+    return message
   },
 }
 

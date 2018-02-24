@@ -27,7 +27,7 @@ type Message implements Node {
   read: Boolean!
   id: ID!
   threadId: Int!
-  error: Int!
+  error: Boolean!
   body: String!
   date: DateTime
   address: String!
@@ -431,7 +431,7 @@ type MessageConnection {
 input MessageCreateInput {
   read: Boolean!
   threadId: Int!
-  error: Int!
+  error: Boolean!
   body: String!
   date: DateTime
   address: String!
@@ -446,7 +446,7 @@ input MessageCreateManyWithoutConversationInput {
 input MessageCreateWithoutConversationInput {
   read: Boolean!
   threadId: Int!
-  error: Int!
+  error: Boolean!
   body: String!
   date: DateTime
   address: String!
@@ -482,7 +482,7 @@ type MessagePreviousValues {
   read: Boolean!
   id: ID!
   threadId: Int!
-  error: Int!
+  error: Boolean!
   body: String!
   date: DateTime
   address: String!
@@ -508,7 +508,7 @@ input MessageSubscriptionWhereInput {
 input MessageUpdateInput {
   read: Boolean
   threadId: Int
-  error: Int
+  error: Boolean
   body: String
   date: DateTime
   address: String
@@ -527,7 +527,7 @@ input MessageUpdateManyWithoutConversationInput {
 input MessageUpdateWithoutConversationDataInput {
   read: Boolean
   threadId: Int
-  error: Int
+  error: Boolean
   body: String
   date: DateTime
   address: String
@@ -571,14 +571,8 @@ input MessageWhereInput {
   threadId_lte: Int
   threadId_gt: Int
   threadId_gte: Int
-  error: Int
-  error_not: Int
-  error_in: [Int!]
-  error_not_in: [Int!]
-  error_lt: Int
-  error_lte: Int
-  error_gt: Int
-  error_gte: Int
+  error: Boolean
+  error_not: Boolean
   body: String
   body_not: String
   body_in: [String!]

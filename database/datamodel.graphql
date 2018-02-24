@@ -31,7 +31,7 @@ type Message @model {
   read: Boolean!
   id: ID! @unique
   threadId: Int!
-  error: Int!
+  error: Boolean!
   body: String!
   date: DateTime
   address: String!

@@ -1,6 +1,7 @@
 const { Query } = require('./Query')
 const { auth } = require('./Mutation/auth')
 const { messages } = require('./Mutation/messages')
+const { conversations } = require('./Mutation/conversations')
 const { AuthPayload } = require('./AuthPayload')
 
 module.exports = {
@@ -8,6 +9,7 @@ module.exports = {
   Mutation: {
     ...auth,
     ...messages,
+    ...conversations,
   },
   AuthPayload,
 }
