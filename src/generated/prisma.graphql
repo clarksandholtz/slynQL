@@ -75,11 +75,23 @@ type AggregateUser {
 }
 
 type BatchPayload {
+  """
+  The number of nodes that have been affected by the Batch operation.
+  """
   count: Long!
 }
 
+"""
+A connection to a list of items.
+"""
 type ConversationConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [ConversationEdge]!
   aggregate: AggregateConversation!
 }
@@ -110,8 +122,17 @@ input ConversationCreateWithoutUserInput {
   messages: MessageCreateManyWithoutConversationInput
 }
 
+"""
+An edge in a connection.
+"""
 type ConversationEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Conversation!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -139,11 +160,29 @@ type ConversationSubscriptionPayload {
 }
 
 input ConversationSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ConversationSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ConversationSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: ConversationWhereInput
 }
@@ -205,29 +244,95 @@ input ConversationUpsertWithoutUserInput {
 }
 
 input ConversationWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ConversationWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ConversationWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   threadId: Int
+  """
+  All values that are not equal to given value.
+  """
   threadId_not: Int
+  """
+  All values that are contained in given list.
+  """
   threadId_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
   threadId_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
   threadId_lt: Int
+  """
+  All values less than or equal the given value.
+  """
   threadId_lte: Int
+  """
+  All values greater than the given value.
+  """
   threadId_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
   threadId_gte: Int
   messages_every: MessageWhereInput
   messages_some: MessageWhereInput
@@ -241,8 +346,17 @@ input ConversationWhereUniqueInput {
 
 scalar DateTime
 
+"""
+A connection to a list of items.
+"""
 type FileConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [FileEdge]!
   aggregate: AggregateFile!
 }
@@ -255,8 +369,17 @@ input FileCreateInput {
   url: String!
 }
 
+"""
+An edge in a connection.
+"""
 type FileEdge {
+  """
+  The item at the end of the edge.
+  """
   node: File!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -298,11 +421,29 @@ type FileSubscriptionPayload {
 }
 
 input FileSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [FileSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [FileSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: FileWhereInput
 }
@@ -316,101 +457,365 @@ input FileUpdateInput {
 }
 
 input FileWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [FileWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [FileWhereInput!]
   contentType: String
+  """
+  All values that are not equal to given value.
+  """
   contentType_not: String
+  """
+  All values that are contained in given list.
+  """
   contentType_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   contentType_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   contentType_lt: String
+  """
+  All values less than or equal the given value.
+  """
   contentType_lte: String
+  """
+  All values greater than the given value.
+  """
   contentType_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   contentType_gte: String
+  """
+  All values containing the given string.
+  """
   contentType_contains: String
+  """
+  All values not containing the given string.
+  """
   contentType_not_contains: String
+  """
+  All values starting with the given string.
+  """
   contentType_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   contentType_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   contentType_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   contentType_not_ends_with: String
   createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   createdAt_gte: DateTime
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   name: String
+  """
+  All values that are not equal to given value.
+  """
   name_not: String
+  """
+  All values that are contained in given list.
+  """
   name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   name_lt: String
+  """
+  All values less than or equal the given value.
+  """
   name_lte: String
+  """
+  All values greater than the given value.
+  """
   name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   name_gte: String
+  """
+  All values containing the given string.
+  """
   name_contains: String
+  """
+  All values not containing the given string.
+  """
   name_not_contains: String
+  """
+  All values starting with the given string.
+  """
   name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   name_not_ends_with: String
   secret: String
+  """
+  All values that are not equal to given value.
+  """
   secret_not: String
+  """
+  All values that are contained in given list.
+  """
   secret_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   secret_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   secret_lt: String
+  """
+  All values less than or equal the given value.
+  """
   secret_lte: String
+  """
+  All values greater than the given value.
+  """
   secret_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   secret_gte: String
+  """
+  All values containing the given string.
+  """
   secret_contains: String
+  """
+  All values not containing the given string.
+  """
   secret_not_contains: String
+  """
+  All values starting with the given string.
+  """
   secret_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   secret_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   secret_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   secret_not_ends_with: String
   size: Int
+  """
+  All values that are not equal to given value.
+  """
   size_not: Int
+  """
+  All values that are contained in given list.
+  """
   size_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
   size_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
   size_lt: Int
+  """
+  All values less than or equal the given value.
+  """
   size_lte: Int
+  """
+  All values greater than the given value.
+  """
   size_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
   size_gte: Int
   updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   updatedAt_gte: DateTime
   url: String
+  """
+  All values that are not equal to given value.
+  """
   url_not: String
+  """
+  All values that are contained in given list.
+  """
   url_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   url_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   url_lt: String
+  """
+  All values less than or equal the given value.
+  """
   url_lte: String
+  """
+  All values greater than the given value.
+  """
   url_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   url_gte: String
+  """
+  All values containing the given string.
+  """
   url_contains: String
+  """
+  All values not containing the given string.
+  """
   url_not_contains: String
+  """
+  All values starting with the given string.
+  """
   url_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   url_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   url_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   url_not_ends_with: String
 }
 
@@ -420,10 +825,23 @@ input FileWhereUniqueInput {
   url: String
 }
 
+"""
+The `Long` scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+"""
 scalar Long
 
+"""
+A connection to a list of items.
+"""
 type MessageConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [MessageEdge]!
   aggregate: AggregateMessage!
 }
@@ -452,8 +870,17 @@ input MessageCreateWithoutConversationInput {
   address: String!
 }
 
+"""
+An edge in a connection.
+"""
 type MessageEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Message!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -496,11 +923,29 @@ type MessageSubscriptionPayload {
 }
 
 input MessageSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [MessageSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [MessageSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: MessageWhereInput
 }
@@ -545,69 +990,240 @@ input MessageUpsertWithoutConversationInput {
 }
 
 input MessageWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [MessageWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [MessageWhereInput!]
   read: Boolean
+  """
+  All values that are not equal to given value.
+  """
   read_not: Boolean
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   threadId: Int
+  """
+  All values that are not equal to given value.
+  """
   threadId_not: Int
+  """
+  All values that are contained in given list.
+  """
   threadId_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
   threadId_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
   threadId_lt: Int
+  """
+  All values less than or equal the given value.
+  """
   threadId_lte: Int
+  """
+  All values greater than the given value.
+  """
   threadId_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
   threadId_gte: Int
   error: Boolean
+  """
+  All values that are not equal to given value.
+  """
   error_not: Boolean
   body: String
+  """
+  All values that are not equal to given value.
+  """
   body_not: String
+  """
+  All values that are contained in given list.
+  """
   body_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   body_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   body_lt: String
+  """
+  All values less than or equal the given value.
+  """
   body_lte: String
+  """
+  All values greater than the given value.
+  """
   body_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   body_gte: String
+  """
+  All values containing the given string.
+  """
   body_contains: String
+  """
+  All values not containing the given string.
+  """
   body_not_contains: String
+  """
+  All values starting with the given string.
+  """
   body_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   body_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   body_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   body_not_ends_with: String
   date: DateTime
+  """
+  All values that are not equal to given value.
+  """
   date_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   date_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   date_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   date_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   date_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   date_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   date_gte: DateTime
   address: String
+  """
+  All values that are not equal to given value.
+  """
   address_not: String
+  """
+  All values that are contained in given list.
+  """
   address_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   address_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   address_lt: String
+  """
+  All values less than or equal the given value.
+  """
   address_lte: String
+  """
+  All values greater than the given value.
+  """
   address_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   address_gte: String
+  """
+  All values containing the given string.
+  """
   address_contains: String
+  """
+  All values not containing the given string.
+  """
   address_not_contains: String
+  """
+  All values starting with the given string.
+  """
   address_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   address_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   address_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   address_not_ends_with: String
   conversation: ConversationWhereInput
 }
@@ -652,18 +1268,42 @@ enum MutationType {
   DELETED
 }
 
+"""
+An object with an ID
+"""
 interface Node {
+  """
+  The id of the object.
+  """
   id: ID!
 }
 
+"""
+A connection to a list of items.
+"""
 type NotificationConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [NotificationEdge]!
   aggregate: AggregateNotification!
 }
 
+"""
+An edge in a connection.
+"""
 type NotificationEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Notification!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -688,31 +1328,94 @@ type NotificationSubscriptionPayload {
 }
 
 input NotificationSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [NotificationSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [NotificationSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: NotificationWhereInput
 }
 
 input NotificationWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [NotificationWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [NotificationWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
 }
 
@@ -720,10 +1423,25 @@ input NotificationWhereUniqueInput {
   id: ID
 }
 
+"""
+Information about pagination in a connection.
+"""
 type PageInfo {
+  """
+  When paginating forwards, are there more items?
+  """
   hasNextPage: Boolean!
+  """
+  When paginating backwards, are there more items?
+  """
   hasPreviousPage: Boolean!
+  """
+  When paginating backwards, the cursor to continue.
+  """
   startCursor: String
+  """
+  When paginating forwards, the cursor to continue.
+  """
   endCursor: String
 }
 
@@ -743,7 +1461,13 @@ type Query {
   conversationsConnection(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConversationConnection!
   messagesConnection(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MessageConnection!
   notificationsConnection(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NotificationConnection!
-  node(id: ID!): Node
+  """
+  Fetches an object given its ID
+  """
+  node("""
+  The ID of an object
+  """
+  id: ID!): Node
 }
 
 type Subscription {
@@ -754,8 +1478,17 @@ type Subscription {
   notification(where: NotificationSubscriptionWhereInput): NotificationSubscriptionPayload
 }
 
+"""
+A connection to a list of items.
+"""
 type UserConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [UserEdge]!
   aggregate: AggregateUser!
 }
@@ -780,8 +1513,17 @@ input UserCreateWithoutConversationsInput {
   phone: String!
 }
 
+"""
+An edge in a connection.
+"""
 type UserEdge {
+  """
+  The item at the end of the edge.
+  """
   node: User!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -820,11 +1562,29 @@ type UserSubscriptionPayload {
 }
 
 input UserSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [UserSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [UserSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: UserWhereInput
 }
@@ -865,93 +1625,336 @@ input UserUpsertWithoutConversationsInput {
 }
 
 input UserWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [UserWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [UserWhereInput!]
   createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   createdAt_gte: DateTime
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   name: String
+  """
+  All values that are not equal to given value.
+  """
   name_not: String
+  """
+  All values that are contained in given list.
+  """
   name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   name_lt: String
+  """
+  All values less than or equal the given value.
+  """
   name_lte: String
+  """
+  All values greater than the given value.
+  """
   name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   name_gte: String
+  """
+  All values containing the given string.
+  """
   name_contains: String
+  """
+  All values not containing the given string.
+  """
   name_not_contains: String
+  """
+  All values starting with the given string.
+  """
   name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   name_not_ends_with: String
   email: String
+  """
+  All values that are not equal to given value.
+  """
   email_not: String
+  """
+  All values that are contained in given list.
+  """
   email_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   email_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   email_lt: String
+  """
+  All values less than or equal the given value.
+  """
   email_lte: String
+  """
+  All values greater than the given value.
+  """
   email_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   email_gte: String
+  """
+  All values containing the given string.
+  """
   email_contains: String
+  """
+  All values not containing the given string.
+  """
   email_not_contains: String
+  """
+  All values starting with the given string.
+  """
   email_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   email_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   email_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   email_not_ends_with: String
   uid: String
+  """
+  All values that are not equal to given value.
+  """
   uid_not: String
+  """
+  All values that are contained in given list.
+  """
   uid_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   uid_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   uid_lt: String
+  """
+  All values less than or equal the given value.
+  """
   uid_lte: String
+  """
+  All values greater than the given value.
+  """
   uid_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   uid_gte: String
+  """
+  All values containing the given string.
+  """
   uid_contains: String
+  """
+  All values not containing the given string.
+  """
   uid_not_contains: String
+  """
+  All values starting with the given string.
+  """
   uid_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   uid_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   uid_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   uid_not_ends_with: String
   phone: String
+  """
+  All values that are not equal to given value.
+  """
   phone_not: String
+  """
+  All values that are contained in given list.
+  """
   phone_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   phone_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   phone_lt: String
+  """
+  All values less than or equal the given value.
+  """
   phone_lte: String
+  """
+  All values greater than the given value.
+  """
   phone_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   phone_gte: String
+  """
+  All values containing the given string.
+  """
   phone_contains: String
+  """
+  All values not containing the given string.
+  """
   phone_not_contains: String
+  """
+  All values starting with the given string.
+  """
   phone_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   phone_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   phone_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   phone_not_ends_with: String
   updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   updatedAt_gte: DateTime
   conversations_every: ConversationWhereInput
   conversations_some: ConversationWhereInput

@@ -38,6 +38,17 @@ type Message @model {
   conversation: Conversation @relation(name: "MessagesInConversation")
 }
 
+type NotificationGroup @model {
+  id: ID! @unique
+  notifications: [Notification!]! @relation(name: "NotificationsInGroup")
+  user: User @relation(name: "UsersNotificationGroup")
+}
+
 type Notification @model {
   id: ID! @unique
+  error: Boolean!
+  body: String!
+  actions: [String!]!
+  date: DateTime
+  notificationGroup: NotificationGroup @relation(name: "NotificationsInGroup")
 }
