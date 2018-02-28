@@ -9,14 +9,21 @@ type Mutation {
   signup(name: String!, phone: String!, email: String!, uid: String!): AuthPayload!
   login(email: String!, uid: String!): AuthPayload!
 
-  createMessage(address: String!, body: String!, read: Boolean!, threadId: Int!, date: DateTime, error: Boolean!): Message!
+  createMessage(address: String!, creator: String!, body: String!, read: Boolean!, threadId: Int!, date: DateTime, error: Boolean!, files: [FileCreateInput]): Message!
   updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
   deleteMessage(id: ID!): Message!
 
   deleteConversation(id: ID!): Conversation!
+  deleteAllMessages: BatchPayload!
+  createMessages(messages: [MessageCreateInput]): StatusPayload!
 }
 
 type AuthPayload {
   token: String!
   user: User!
+}
+
+type StatusPayload {
+  success: Boolean!
+  status: String!
 }
