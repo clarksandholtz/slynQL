@@ -7,9 +7,12 @@
 
 type Conversation implements Node {
   id: ID!
+  threadId: Int!
   messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message!]
   user(where: UserWhereInput): User
-  threadId: Int!
+  participants(where: ContactWhereInput, orderBy: ContactOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Contact!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type File implements Node {
@@ -24,35 +27,57 @@ type File implements Node {
 }
 
 type Message implements Node {
-  read: Boolean!
   id: ID!
+  creator: String!
+  address: String!
+  read: Boolean!
+  body: String!
   threadId: Int!
   error: Boolean!
-  body: String!
-  date: DateTime
-  address: String!
+  date: DateTime!
   conversation(where: ConversationWhereInput): Conversation
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Notification implements Node {
   id: ID!
+  error: Boolean!
+  body: String!
+  actions: [String!]
+  date: DateTime
+  notificationGroup(where: NotificationGroupWhereInput): NotificationGroup
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type NotificationGroup implements Node {
+  id: ID!
+  notifications(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Notification!]
+  user(where: UserWhereInput): User
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type User implements Node {
-  createdAt: DateTime!
   id: ID!
   name: String!
   email: String!
   uid: String!
   phone: String!
-  updatedAt: DateTime!
   conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 
 #
 # Other Types
 #
+
+type AggregateContact {
+  count: Int!
+}
 
 type AggregateConversation {
   count: Int!
@@ -70,6 +95,10 @@ type AggregateNotification {
   count: Int!
 }
 
+type AggregateNotificationGroup {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -79,6 +108,177 @@ type BatchPayload {
   The number of nodes that have been affected by the Batch operation.
   """
   count: Long!
+}
+
+type Contact {
+  phone: String!
+  conversation(where: ConversationWhereInput): Conversation
+}
+
+"""
+A connection to a list of items.
+"""
+type ContactConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [ContactEdge]!
+  aggregate: AggregateContact!
+}
+
+input ContactCreateInput {
+  phone: String!
+  conversation: ConversationCreateOneWithoutParticipantsInput
+}
+
+input ContactCreateManyWithoutConversationInput {
+  create: [ContactCreateWithoutConversationInput!]
+}
+
+input ContactCreateWithoutConversationInput {
+  phone: String!
+}
+
+"""
+An edge in a connection.
+"""
+type ContactEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Contact!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum ContactOrderByInput {
+  phone_ASC
+  phone_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type ContactPreviousValues {
+  phone: String!
+}
+
+type ContactSubscriptionPayload {
+  mutation: MutationType!
+  node: Contact
+  updatedFields: [String!]
+  previousValues: ContactPreviousValues
+}
+
+input ContactSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ContactSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ContactSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: ContactWhereInput
+}
+
+input ContactUpdateInput {
+  phone: String
+  conversation: ConversationUpdateOneWithoutParticipantsInput
+}
+
+input ContactUpdateManyWithoutConversationInput {
+  create: [ContactCreateWithoutConversationInput!]
+}
+
+input ContactWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ContactWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ContactWhereInput!]
+  phone: String
+  """
+  All values that are not equal to given value.
+  """
+  phone_not: String
+  """
+  All values that are contained in given list.
+  """
+  phone_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  phone_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  phone_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  phone_lte: String
+  """
+  All values greater than the given value.
+  """
+  phone_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  phone_gte: String
+  """
+  All values containing the given string.
+  """
+  phone_contains: String
+  """
+  All values not containing the given string.
+  """
+  phone_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  phone_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  phone_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  phone_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  phone_not_ends_with: String
+  conversation: ConversationWhereInput
 }
 
 """
@@ -100,6 +300,7 @@ input ConversationCreateInput {
   threadId: Int!
   messages: MessageCreateManyWithoutConversationInput
   user: UserCreateOneWithoutConversationsInput
+  participants: ContactCreateManyWithoutConversationInput
 }
 
 input ConversationCreateManyWithoutUserInput {
@@ -112,14 +313,27 @@ input ConversationCreateOneWithoutMessagesInput {
   connect: ConversationWhereUniqueInput
 }
 
+input ConversationCreateOneWithoutParticipantsInput {
+  create: ConversationCreateWithoutParticipantsInput
+  connect: ConversationWhereUniqueInput
+}
+
 input ConversationCreateWithoutMessagesInput {
   threadId: Int!
+  user: UserCreateOneWithoutConversationsInput
+  participants: ContactCreateManyWithoutConversationInput
+}
+
+input ConversationCreateWithoutParticipantsInput {
+  threadId: Int!
+  messages: MessageCreateManyWithoutConversationInput
   user: UserCreateOneWithoutConversationsInput
 }
 
 input ConversationCreateWithoutUserInput {
   threadId: Int!
   messages: MessageCreateManyWithoutConversationInput
+  participants: ContactCreateManyWithoutConversationInput
 }
 
 """
@@ -141,15 +355,17 @@ enum ConversationOrderByInput {
   id_DESC
   threadId_ASC
   threadId_DESC
-  updatedAt_ASC
-  updatedAt_DESC
   createdAt_ASC
   createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type ConversationPreviousValues {
   id: ID!
   threadId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ConversationSubscriptionPayload {
@@ -191,6 +407,7 @@ input ConversationUpdateInput {
   threadId: Int
   messages: MessageUpdateManyWithoutConversationInput
   user: UserUpdateOneWithoutConversationsInput
+  participants: ContactUpdateManyWithoutConversationInput
 }
 
 input ConversationUpdateManyWithoutUserInput {
@@ -211,9 +428,19 @@ input ConversationUpdateOneWithoutMessagesInput {
   upsert: ConversationUpsertWithoutMessagesInput
 }
 
+input ConversationUpdateOneWithoutParticipantsInput {
+  create: ConversationCreateWithoutParticipantsInput
+  connect: ConversationWhereUniqueInput
+  disconnect: ConversationWhereUniqueInput
+  delete: ConversationWhereUniqueInput
+  update: ConversationUpdateWithoutParticipantsInput
+  upsert: ConversationUpsertWithoutParticipantsInput
+}
+
 input ConversationUpdateWithoutMessagesDataInput {
   threadId: Int
   user: UserUpdateOneWithoutConversationsInput
+  participants: ContactUpdateManyWithoutConversationInput
 }
 
 input ConversationUpdateWithoutMessagesInput {
@@ -221,9 +448,21 @@ input ConversationUpdateWithoutMessagesInput {
   data: ConversationUpdateWithoutMessagesDataInput!
 }
 
+input ConversationUpdateWithoutParticipantsDataInput {
+  threadId: Int
+  messages: MessageUpdateManyWithoutConversationInput
+  user: UserUpdateOneWithoutConversationsInput
+}
+
+input ConversationUpdateWithoutParticipantsInput {
+  where: ConversationWhereUniqueInput!
+  data: ConversationUpdateWithoutParticipantsDataInput!
+}
+
 input ConversationUpdateWithoutUserDataInput {
   threadId: Int
   messages: MessageUpdateManyWithoutConversationInput
+  participants: ContactUpdateManyWithoutConversationInput
 }
 
 input ConversationUpdateWithoutUserInput {
@@ -235,6 +474,12 @@ input ConversationUpsertWithoutMessagesInput {
   where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutMessagesDataInput!
   create: ConversationCreateWithoutMessagesInput!
+}
+
+input ConversationUpsertWithoutParticipantsInput {
+  where: ConversationWhereUniqueInput!
+  update: ConversationUpdateWithoutParticipantsDataInput!
+  create: ConversationCreateWithoutParticipantsInput!
 }
 
 input ConversationUpsertWithoutUserInput {
@@ -334,10 +579,71 @@ input ConversationWhereInput {
   All values greater than or equal the given value.
   """
   threadId_gte: Int
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
   messages_every: MessageWhereInput
   messages_some: MessageWhereInput
   messages_none: MessageWhereInput
   user: UserWhereInput
+  participants_every: ContactWhereInput
+  participants_some: ContactWhereInput
+  participants_none: ContactWhereInput
 }
 
 input ConversationWhereUniqueInput {
@@ -847,12 +1153,13 @@ type MessageConnection {
 }
 
 input MessageCreateInput {
+  creator: String!
+  address: String!
   read: Boolean!
+  body: String!
   threadId: Int!
   error: Boolean!
-  body: String!
-  date: DateTime
-  address: String!
+  date: DateTime!
   conversation: ConversationCreateOneWithoutMessagesInput
 }
 
@@ -862,12 +1169,13 @@ input MessageCreateManyWithoutConversationInput {
 }
 
 input MessageCreateWithoutConversationInput {
+  creator: String!
+  address: String!
   read: Boolean!
+  body: String!
   threadId: Int!
   error: Boolean!
-  body: String!
-  date: DateTime
-  address: String!
+  date: DateTime!
 }
 
 """
@@ -885,34 +1193,39 @@ type MessageEdge {
 }
 
 enum MessageOrderByInput {
-  read_ASC
-  read_DESC
   id_ASC
   id_DESC
+  creator_ASC
+  creator_DESC
+  address_ASC
+  address_DESC
+  read_ASC
+  read_DESC
+  body_ASC
+  body_DESC
   threadId_ASC
   threadId_DESC
   error_ASC
   error_DESC
-  body_ASC
-  body_DESC
   date_ASC
   date_DESC
-  address_ASC
-  address_DESC
-  updatedAt_ASC
-  updatedAt_DESC
   createdAt_ASC
   createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type MessagePreviousValues {
-  read: Boolean!
   id: ID!
+  creator: String!
+  address: String!
+  read: Boolean!
+  body: String!
   threadId: Int!
   error: Boolean!
-  body: String!
-  date: DateTime
-  address: String!
+  date: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type MessageSubscriptionPayload {
@@ -951,12 +1264,13 @@ input MessageSubscriptionWhereInput {
 }
 
 input MessageUpdateInput {
+  creator: String
+  address: String
   read: Boolean
+  body: String
   threadId: Int
   error: Boolean
-  body: String
   date: DateTime
-  address: String
   conversation: ConversationUpdateOneWithoutMessagesInput
 }
 
@@ -970,12 +1284,13 @@ input MessageUpdateManyWithoutConversationInput {
 }
 
 input MessageUpdateWithoutConversationDataInput {
+  creator: String
+  address: String
   read: Boolean
+  body: String
   threadId: Int
   error: Boolean
-  body: String
   date: DateTime
-  address: String
 }
 
 input MessageUpdateWithoutConversationInput {
@@ -998,11 +1313,6 @@ input MessageWhereInput {
   Logical OR on all given filters.
   """
   OR: [MessageWhereInput!]
-  read: Boolean
-  """
-  All values that are not equal to given value.
-  """
-  read_not: Boolean
   id: ID
   """
   All values that are not equal to given value.
@@ -1056,6 +1366,170 @@ input MessageWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
+  creator: String
+  """
+  All values that are not equal to given value.
+  """
+  creator_not: String
+  """
+  All values that are contained in given list.
+  """
+  creator_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  creator_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  creator_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  creator_lte: String
+  """
+  All values greater than the given value.
+  """
+  creator_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  creator_gte: String
+  """
+  All values containing the given string.
+  """
+  creator_contains: String
+  """
+  All values not containing the given string.
+  """
+  creator_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  creator_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  creator_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  creator_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  creator_not_ends_with: String
+  address: String
+  """
+  All values that are not equal to given value.
+  """
+  address_not: String
+  """
+  All values that are contained in given list.
+  """
+  address_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  address_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  address_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  address_lte: String
+  """
+  All values greater than the given value.
+  """
+  address_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  address_gte: String
+  """
+  All values containing the given string.
+  """
+  address_contains: String
+  """
+  All values not containing the given string.
+  """
+  address_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  address_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  address_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  address_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  address_not_ends_with: String
+  read: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  read_not: Boolean
+  body: String
+  """
+  All values that are not equal to given value.
+  """
+  body_not: String
+  """
+  All values that are contained in given list.
+  """
+  body_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  body_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  body_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  body_lte: String
+  """
+  All values greater than the given value.
+  """
+  body_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  body_gte: String
+  """
+  All values containing the given string.
+  """
+  body_contains: String
+  """
+  All values not containing the given string.
+  """
+  body_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  body_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  body_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  body_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  body_not_ends_with: String
   threadId: Int
   """
   All values that are not equal to given value.
@@ -1085,6 +1559,629 @@ input MessageWhereInput {
   All values greater than or equal the given value.
   """
   threadId_gte: Int
+  error: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  error_not: Boolean
+  date: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  date_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  date_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  date_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  date_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  date_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  date_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  date_gte: DateTime
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  conversation: ConversationWhereInput
+}
+
+input MessageWhereUniqueInput {
+  id: ID
+}
+
+type Mutation {
+  createFile(data: FileCreateInput!): File!
+  createUser(data: UserCreateInput!): User!
+  createConversation(data: ConversationCreateInput!): Conversation!
+  createMessage(data: MessageCreateInput!): Message!
+  createNotificationGroup(data: NotificationGroupCreateInput!): NotificationGroup!
+  createNotification(data: NotificationCreateInput!): Notification!
+  createContact(data: ContactCreateInput!): Contact!
+  updateFile(data: FileUpdateInput!, where: FileWhereUniqueInput!): File
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateConversation(data: ConversationUpdateInput!, where: ConversationWhereUniqueInput!): Conversation
+  updateMessage(data: MessageUpdateInput!, where: MessageWhereUniqueInput!): Message
+  updateNotificationGroup(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereUniqueInput!): NotificationGroup
+  updateNotification(data: NotificationUpdateInput!, where: NotificationWhereUniqueInput!): Notification
+  deleteFile(where: FileWhereUniqueInput!): File
+  deleteUser(where: UserWhereUniqueInput!): User
+  deleteConversation(where: ConversationWhereUniqueInput!): Conversation
+  deleteMessage(where: MessageWhereUniqueInput!): Message
+  deleteNotificationGroup(where: NotificationGroupWhereUniqueInput!): NotificationGroup
+  deleteNotification(where: NotificationWhereUniqueInput!): Notification
+  upsertFile(where: FileWhereUniqueInput!, create: FileCreateInput!, update: FileUpdateInput!): File!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertConversation(where: ConversationWhereUniqueInput!, create: ConversationCreateInput!, update: ConversationUpdateInput!): Conversation!
+  upsertMessage(where: MessageWhereUniqueInput!, create: MessageCreateInput!, update: MessageUpdateInput!): Message!
+  upsertNotificationGroup(where: NotificationGroupWhereUniqueInput!, create: NotificationGroupCreateInput!, update: NotificationGroupUpdateInput!): NotificationGroup!
+  upsertNotification(where: NotificationWhereUniqueInput!, create: NotificationCreateInput!, update: NotificationUpdateInput!): Notification!
+  updateManyFiles(data: FileUpdateInput!, where: FileWhereInput!): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
+  updateManyConversations(data: ConversationUpdateInput!, where: ConversationWhereInput!): BatchPayload!
+  updateManyMessages(data: MessageUpdateInput!, where: MessageWhereInput!): BatchPayload!
+  updateManyNotificationGroups(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereInput!): BatchPayload!
+  updateManyNotifications(data: NotificationUpdateInput!, where: NotificationWhereInput!): BatchPayload!
+  updateManyContacts(data: ContactUpdateInput!, where: ContactWhereInput!): BatchPayload!
+  deleteManyFiles(where: FileWhereInput!): BatchPayload!
+  deleteManyUsers(where: UserWhereInput!): BatchPayload!
+  deleteManyConversations(where: ConversationWhereInput!): BatchPayload!
+  deleteManyMessages(where: MessageWhereInput!): BatchPayload!
+  deleteManyNotificationGroups(where: NotificationGroupWhereInput!): BatchPayload!
+  deleteManyNotifications(where: NotificationWhereInput!): BatchPayload!
+  deleteManyContacts(where: ContactWhereInput!): BatchPayload!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+"""
+An object with an ID
+"""
+interface Node {
+  """
+  The id of the object.
+  """
+  id: ID!
+}
+
+"""
+A connection to a list of items.
+"""
+type NotificationConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [NotificationEdge]!
+  aggregate: AggregateNotification!
+}
+
+input NotificationCreateactionsInput {
+  set: [String!]
+}
+
+input NotificationCreateInput {
+  error: Boolean!
+  body: String!
+  date: DateTime
+  actions: NotificationCreateactionsInput
+  notificationGroup: NotificationGroupCreateOneWithoutNotificationsInput
+}
+
+input NotificationCreateManyWithoutNotificationGroupInput {
+  create: [NotificationCreateWithoutNotificationGroupInput!]
+  connect: [NotificationWhereUniqueInput!]
+}
+
+input NotificationCreateWithoutNotificationGroupInput {
+  error: Boolean!
+  body: String!
+  date: DateTime
+  actions: NotificationCreateactionsInput
+}
+
+"""
+An edge in a connection.
+"""
+type NotificationEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Notification!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type NotificationGroupConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [NotificationGroupEdge]!
+  aggregate: AggregateNotificationGroup!
+}
+
+input NotificationGroupCreateInput {
+  notifications: NotificationCreateManyWithoutNotificationGroupInput
+  user: UserCreateOneInput
+}
+
+input NotificationGroupCreateOneWithoutNotificationsInput {
+  create: NotificationGroupCreateWithoutNotificationsInput
+  connect: NotificationGroupWhereUniqueInput
+}
+
+input NotificationGroupCreateWithoutNotificationsInput {
+  user: UserCreateOneInput
+}
+
+"""
+An edge in a connection.
+"""
+type NotificationGroupEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: NotificationGroup!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum NotificationGroupOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type NotificationGroupPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type NotificationGroupSubscriptionPayload {
+  mutation: MutationType!
+  node: NotificationGroup
+  updatedFields: [String!]
+  previousValues: NotificationGroupPreviousValues
+}
+
+input NotificationGroupSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [NotificationGroupSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [NotificationGroupSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: NotificationGroupWhereInput
+}
+
+input NotificationGroupUpdateInput {
+  notifications: NotificationUpdateManyWithoutNotificationGroupInput
+  user: UserUpdateOneInput
+}
+
+input NotificationGroupUpdateOneWithoutNotificationsInput {
+  create: NotificationGroupCreateWithoutNotificationsInput
+  connect: NotificationGroupWhereUniqueInput
+  disconnect: NotificationGroupWhereUniqueInput
+  delete: NotificationGroupWhereUniqueInput
+  update: NotificationGroupUpdateWithoutNotificationsInput
+  upsert: NotificationGroupUpsertWithoutNotificationsInput
+}
+
+input NotificationGroupUpdateWithoutNotificationsDataInput {
+  user: UserUpdateOneInput
+}
+
+input NotificationGroupUpdateWithoutNotificationsInput {
+  where: NotificationGroupWhereUniqueInput!
+  data: NotificationGroupUpdateWithoutNotificationsDataInput!
+}
+
+input NotificationGroupUpsertWithoutNotificationsInput {
+  where: NotificationGroupWhereUniqueInput!
+  update: NotificationGroupUpdateWithoutNotificationsDataInput!
+  create: NotificationGroupCreateWithoutNotificationsInput!
+}
+
+input NotificationGroupWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [NotificationGroupWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [NotificationGroupWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  notifications_every: NotificationWhereInput
+  notifications_some: NotificationWhereInput
+  notifications_none: NotificationWhereInput
+  user: UserWhereInput
+}
+
+input NotificationGroupWhereUniqueInput {
+  id: ID
+}
+
+enum NotificationOrderByInput {
+  id_ASC
+  id_DESC
+  error_ASC
+  error_DESC
+  body_ASC
+  body_DESC
+  date_ASC
+  date_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type NotificationPreviousValues {
+  id: ID!
+  error: Boolean!
+  body: String!
+  actions: [String!]
+  date: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type NotificationSubscriptionPayload {
+  mutation: MutationType!
+  node: Notification
+  updatedFields: [String!]
+  previousValues: NotificationPreviousValues
+}
+
+input NotificationSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [NotificationSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [NotificationSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: NotificationWhereInput
+}
+
+input NotificationUpdateactionsInput {
+  set: [String!]
+}
+
+input NotificationUpdateInput {
+  error: Boolean
+  body: String
+  date: DateTime
+  actions: NotificationUpdateactionsInput
+  notificationGroup: NotificationGroupUpdateOneWithoutNotificationsInput
+}
+
+input NotificationUpdateManyWithoutNotificationGroupInput {
+  create: [NotificationCreateWithoutNotificationGroupInput!]
+  connect: [NotificationWhereUniqueInput!]
+  disconnect: [NotificationWhereUniqueInput!]
+  delete: [NotificationWhereUniqueInput!]
+  update: [NotificationUpdateWithoutNotificationGroupInput!]
+  upsert: [NotificationUpsertWithoutNotificationGroupInput!]
+}
+
+input NotificationUpdateWithoutNotificationGroupDataInput {
+  error: Boolean
+  body: String
+  date: DateTime
+  actions: NotificationUpdateactionsInput
+}
+
+input NotificationUpdateWithoutNotificationGroupInput {
+  where: NotificationWhereUniqueInput!
+  data: NotificationUpdateWithoutNotificationGroupDataInput!
+}
+
+input NotificationUpsertWithoutNotificationGroupInput {
+  where: NotificationWhereUniqueInput!
+  update: NotificationUpdateWithoutNotificationGroupDataInput!
+  create: NotificationCreateWithoutNotificationGroupInput!
+}
+
+input NotificationWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [NotificationWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [NotificationWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
   error: Boolean
   """
   All values that are not equal to given value.
@@ -1172,251 +2269,65 @@ input MessageWhereInput {
   All values greater than or equal the given value.
   """
   date_gte: DateTime
-  address: String
+  createdAt: DateTime
   """
   All values that are not equal to given value.
   """
-  address_not: String
+  createdAt_not: DateTime
   """
   All values that are contained in given list.
   """
-  address_in: [String!]
+  createdAt_in: [DateTime!]
   """
   All values that are not contained in given list.
   """
-  address_not_in: [String!]
+  createdAt_not_in: [DateTime!]
   """
   All values less than the given value.
   """
-  address_lt: String
+  createdAt_lt: DateTime
   """
   All values less than or equal the given value.
   """
-  address_lte: String
+  createdAt_lte: DateTime
   """
   All values greater than the given value.
   """
-  address_gt: String
+  createdAt_gt: DateTime
   """
   All values greater than or equal the given value.
   """
-  address_gte: String
-  """
-  All values containing the given string.
-  """
-  address_contains: String
-  """
-  All values not containing the given string.
-  """
-  address_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  address_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  address_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  address_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  address_not_ends_with: String
-  conversation: ConversationWhereInput
-}
-
-input MessageWhereUniqueInput {
-  id: ID
-}
-
-type Mutation {
-  createFile(data: FileCreateInput!): File!
-  createUser(data: UserCreateInput!): User!
-  createConversation(data: ConversationCreateInput!): Conversation!
-  createMessage(data: MessageCreateInput!): Message!
-  createNotification: Notification!
-  updateFile(data: FileUpdateInput!, where: FileWhereUniqueInput!): File
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  updateConversation(data: ConversationUpdateInput!, where: ConversationWhereUniqueInput!): Conversation
-  updateMessage(data: MessageUpdateInput!, where: MessageWhereUniqueInput!): Message
-  deleteFile(where: FileWhereUniqueInput!): File
-  deleteUser(where: UserWhereUniqueInput!): User
-  deleteConversation(where: ConversationWhereUniqueInput!): Conversation
-  deleteMessage(where: MessageWhereUniqueInput!): Message
-  deleteNotification(where: NotificationWhereUniqueInput!): Notification
-  upsertFile(where: FileWhereUniqueInput!, create: FileCreateInput!, update: FileUpdateInput!): File!
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  upsertConversation(where: ConversationWhereUniqueInput!, create: ConversationCreateInput!, update: ConversationUpdateInput!): Conversation!
-  upsertMessage(where: MessageWhereUniqueInput!, create: MessageCreateInput!, update: MessageUpdateInput!): Message!
-  updateManyFiles(data: FileUpdateInput!, where: FileWhereInput!): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
-  updateManyConversations(data: ConversationUpdateInput!, where: ConversationWhereInput!): BatchPayload!
-  updateManyMessages(data: MessageUpdateInput!, where: MessageWhereInput!): BatchPayload!
-  deleteManyFiles(where: FileWhereInput!): BatchPayload!
-  deleteManyUsers(where: UserWhereInput!): BatchPayload!
-  deleteManyConversations(where: ConversationWhereInput!): BatchPayload!
-  deleteManyMessages(where: MessageWhereInput!): BatchPayload!
-  deleteManyNotifications(where: NotificationWhereInput!): BatchPayload!
-}
-
-enum MutationType {
-  CREATED
-  UPDATED
-  DELETED
-}
-
-"""
-An object with an ID
-"""
-interface Node {
-  """
-  The id of the object.
-  """
-  id: ID!
-}
-
-"""
-A connection to a list of items.
-"""
-type NotificationConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [NotificationEdge]!
-  aggregate: AggregateNotification!
-}
-
-"""
-An edge in a connection.
-"""
-type NotificationEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Notification!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum NotificationOrderByInput {
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type NotificationPreviousValues {
-  id: ID!
-}
-
-type NotificationSubscriptionPayload {
-  mutation: MutationType!
-  node: Notification
-  updatedFields: [String!]
-  previousValues: NotificationPreviousValues
-}
-
-input NotificationSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [NotificationSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [NotificationSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: NotificationWhereInput
-}
-
-input NotificationWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [NotificationWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [NotificationWhereInput!]
-  id: ID
+  createdAt_gte: DateTime
+  updatedAt: DateTime
   """
   All values that are not equal to given value.
   """
-  id_not: ID
+  updatedAt_not: DateTime
   """
   All values that are contained in given list.
   """
-  id_in: [ID!]
+  updatedAt_in: [DateTime!]
   """
   All values that are not contained in given list.
   """
-  id_not_in: [ID!]
+  updatedAt_not_in: [DateTime!]
   """
   All values less than the given value.
   """
-  id_lt: ID
+  updatedAt_lt: DateTime
   """
   All values less than or equal the given value.
   """
-  id_lte: ID
+  updatedAt_lte: DateTime
   """
   All values greater than the given value.
   """
-  id_gt: ID
+  updatedAt_gt: DateTime
   """
   All values greater than or equal the given value.
   """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
+  updatedAt_gte: DateTime
+  notificationGroup: NotificationGroupWhereInput
 }
 
 input NotificationWhereUniqueInput {
@@ -1450,17 +2361,22 @@ type Query {
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation]!
   messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message]!
+  notificationGroups(where: NotificationGroupWhereInput, orderBy: NotificationGroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NotificationGroup]!
   notifications(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Notification]!
+  contacts(where: ContactWhereInput, orderBy: ContactOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Contact]!
   file(where: FileWhereUniqueInput!): File
   user(where: UserWhereUniqueInput!): User
   conversation(where: ConversationWhereUniqueInput!): Conversation
   message(where: MessageWhereUniqueInput!): Message
+  notificationGroup(where: NotificationGroupWhereUniqueInput!): NotificationGroup
   notification(where: NotificationWhereUniqueInput!): Notification
   filesConnection(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FileConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   conversationsConnection(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConversationConnection!
   messagesConnection(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MessageConnection!
+  notificationGroupsConnection(where: NotificationGroupWhereInput, orderBy: NotificationGroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NotificationGroupConnection!
   notificationsConnection(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NotificationConnection!
+  contactsConnection(where: ContactWhereInput, orderBy: ContactOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ContactConnection!
   """
   Fetches an object given its ID
   """
@@ -1475,7 +2391,9 @@ type Subscription {
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   conversation(where: ConversationSubscriptionWhereInput): ConversationSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
+  notificationGroup(where: NotificationGroupSubscriptionWhereInput): NotificationGroupSubscriptionPayload
   notification(where: NotificationSubscriptionWhereInput): NotificationSubscriptionPayload
+  contact(where: ContactSubscriptionWhereInput): ContactSubscriptionPayload
 }
 
 """
@@ -1499,6 +2417,11 @@ input UserCreateInput {
   uid: String!
   phone: String!
   conversations: ConversationCreateManyWithoutUserInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutConversationsInput {
@@ -1528,8 +2451,6 @@ type UserEdge {
 }
 
 enum UserOrderByInput {
-  createdAt_ASC
-  createdAt_DESC
   id_ASC
   id_DESC
   name_ASC
@@ -1540,17 +2461,19 @@ enum UserOrderByInput {
   uid_DESC
   phone_ASC
   phone_DESC
+  createdAt_ASC
+  createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
 }
 
 type UserPreviousValues {
-  createdAt: DateTime!
   id: ID!
   name: String!
   email: String!
   uid: String!
   phone: String!
+  createdAt: DateTime!
   updatedAt: DateTime!
 }
 
@@ -1589,12 +2512,34 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
+input UserUpdateDataInput {
+  name: String
+  email: String
+  uid: String
+  phone: String
+  conversations: ConversationUpdateManyWithoutUserInput
+}
+
 input UserUpdateInput {
   name: String
   email: String
   uid: String
   phone: String
   conversations: ConversationUpdateManyWithoutUserInput
+}
+
+input UserUpdateNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateNestedInput
+  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutConversationsInput {
@@ -1618,6 +2563,12 @@ input UserUpdateWithoutConversationsInput {
   data: UserUpdateWithoutConversationsDataInput!
 }
 
+input UserUpsertNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
+}
+
 input UserUpsertWithoutConversationsInput {
   where: UserWhereUniqueInput!
   update: UserUpdateWithoutConversationsDataInput!
@@ -1633,35 +2584,6 @@ input UserWhereInput {
   Logical OR on all given filters.
   """
   OR: [UserWhereInput!]
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
   id: ID
   """
   All values that are not equal to given value.
@@ -1927,6 +2849,35 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   phone_not_ends_with: String
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
   updatedAt: DateTime
   """
   All values that are not equal to given value.
