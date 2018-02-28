@@ -44,8 +44,23 @@ type Message @model {
   updatedAt: DateTime!
 }
 
+type NotificationGroup @model {
+  id: ID! @unique
+  notifications: [Notification!]! @relation(name: "NotificationsInGroup")
+  user: User @relation(name: "UsersNotificationGroup")
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Notification @model {
   id: ID! @unique
+  error: Boolean!
+  body: String!
+  actions: [String!]!
+  date: DateTime
+  notificationGroup: NotificationGroup @relation(name: "NotificationsInGroup")
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Contact @model {
