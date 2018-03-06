@@ -1,12 +1,10 @@
 type File @model {
-  contentType: String!
-  createdAt: DateTime!
   id: ID! @unique
-  name: String!
-  secret: String! @unique
-  size: Int!
+  message: Message @relation(name: "FileInMessage")
+  contentType: String!
+  content: String! 
   updatedAt: DateTime!
-  url: String! @unique
+  createdAt: DateTime!
 }
 
 type User @model {
@@ -32,13 +30,16 @@ type Conversation @model {
 
 type Message @model {
   id: ID! @unique
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: [File!]! @relation(name: "FileInMessage")
   conversation: Conversation @relation(name: "MessagesInConversation")
   createdAt: DateTime!
   updatedAt: DateTime!

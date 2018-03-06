@@ -16,25 +16,26 @@ type Conversation implements Node {
 }
 
 type File implements Node {
-  contentType: String!
-  createdAt: DateTime!
   id: ID!
-  name: String!
-  secret: String!
-  size: Int!
+  message(where: MessageWhereInput): Message
+  contentType: String!
+  content: String!
   updatedAt: DateTime!
-  url: String!
+  createdAt: DateTime!
 }
 
 type Message implements Node {
   id: ID!
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
   conversation(where: ConversationWhereInput): Conversation
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -669,10 +670,18 @@ type FileConnection {
 
 input FileCreateInput {
   contentType: String!
-  name: String!
-  secret: String!
-  size: Int!
-  url: String!
+  content: String!
+  message: MessageCreateOneWithoutFilesInput
+}
+
+input FileCreateManyWithoutMessageInput {
+  create: [FileCreateWithoutMessageInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileCreateWithoutMessageInput {
+  contentType: String!
+  content: String!
 }
 
 """
@@ -690,33 +699,24 @@ type FileEdge {
 }
 
 enum FileOrderByInput {
-  contentType_ASC
-  contentType_DESC
-  createdAt_ASC
-  createdAt_DESC
   id_ASC
   id_DESC
-  name_ASC
-  name_DESC
-  secret_ASC
-  secret_DESC
-  size_ASC
-  size_DESC
+  contentType_ASC
+  contentType_DESC
+  content_ASC
+  content_DESC
   updatedAt_ASC
   updatedAt_DESC
-  url_ASC
-  url_DESC
+  createdAt_ASC
+  createdAt_DESC
 }
 
 type FilePreviousValues {
-  contentType: String!
-  createdAt: DateTime!
   id: ID!
-  name: String!
-  secret: String!
-  size: Int!
+  contentType: String!
+  content: String!
   updatedAt: DateTime!
-  url: String!
+  createdAt: DateTime!
 }
 
 type FileSubscriptionPayload {
@@ -756,10 +756,33 @@ input FileSubscriptionWhereInput {
 
 input FileUpdateInput {
   contentType: String
-  name: String
-  secret: String
-  size: Int
-  url: String
+  content: String
+  message: MessageUpdateOneWithoutFilesInput
+}
+
+input FileUpdateManyWithoutMessageInput {
+  create: [FileCreateWithoutMessageInput!]
+  connect: [FileWhereUniqueInput!]
+  disconnect: [FileWhereUniqueInput!]
+  delete: [FileWhereUniqueInput!]
+  update: [FileUpdateWithoutMessageInput!]
+  upsert: [FileUpsertWithoutMessageInput!]
+}
+
+input FileUpdateWithoutMessageDataInput {
+  contentType: String
+  content: String
+}
+
+input FileUpdateWithoutMessageInput {
+  where: FileWhereUniqueInput!
+  data: FileUpdateWithoutMessageDataInput!
+}
+
+input FileUpsertWithoutMessageInput {
+  where: FileWhereUniqueInput!
+  update: FileUpdateWithoutMessageDataInput!
+  create: FileCreateWithoutMessageInput!
 }
 
 input FileWhereInput {
@@ -771,88 +794,6 @@ input FileWhereInput {
   Logical OR on all given filters.
   """
   OR: [FileWhereInput!]
-  contentType: String
-  """
-  All values that are not equal to given value.
-  """
-  contentType_not: String
-  """
-  All values that are contained in given list.
-  """
-  contentType_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  contentType_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  contentType_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  contentType_lte: String
-  """
-  All values greater than the given value.
-  """
-  contentType_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  contentType_gte: String
-  """
-  All values containing the given string.
-  """
-  contentType_contains: String
-  """
-  All values not containing the given string.
-  """
-  contentType_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  contentType_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  contentType_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  contentType_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  contentType_not_ends_with: String
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
   id: ID
   """
   All values that are not equal to given value.
@@ -906,141 +847,112 @@ input FileWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
-  name: String
+  contentType: String
   """
   All values that are not equal to given value.
   """
-  name_not: String
+  contentType_not: String
   """
   All values that are contained in given list.
   """
-  name_in: [String!]
+  contentType_in: [String!]
   """
   All values that are not contained in given list.
   """
-  name_not_in: [String!]
+  contentType_not_in: [String!]
   """
   All values less than the given value.
   """
-  name_lt: String
+  contentType_lt: String
   """
   All values less than or equal the given value.
   """
-  name_lte: String
+  contentType_lte: String
   """
   All values greater than the given value.
   """
-  name_gt: String
+  contentType_gt: String
   """
   All values greater than or equal the given value.
   """
-  name_gte: String
+  contentType_gte: String
   """
   All values containing the given string.
   """
-  name_contains: String
+  contentType_contains: String
   """
   All values not containing the given string.
   """
-  name_not_contains: String
+  contentType_not_contains: String
   """
   All values starting with the given string.
   """
-  name_starts_with: String
+  contentType_starts_with: String
   """
   All values not starting with the given string.
   """
-  name_not_starts_with: String
+  contentType_not_starts_with: String
   """
   All values ending with the given string.
   """
-  name_ends_with: String
+  contentType_ends_with: String
   """
   All values not ending with the given string.
   """
-  name_not_ends_with: String
-  secret: String
+  contentType_not_ends_with: String
+  content: String
   """
   All values that are not equal to given value.
   """
-  secret_not: String
+  content_not: String
   """
   All values that are contained in given list.
   """
-  secret_in: [String!]
+  content_in: [String!]
   """
   All values that are not contained in given list.
   """
-  secret_not_in: [String!]
+  content_not_in: [String!]
   """
   All values less than the given value.
   """
-  secret_lt: String
+  content_lt: String
   """
   All values less than or equal the given value.
   """
-  secret_lte: String
+  content_lte: String
   """
   All values greater than the given value.
   """
-  secret_gt: String
+  content_gt: String
   """
   All values greater than or equal the given value.
   """
-  secret_gte: String
+  content_gte: String
   """
   All values containing the given string.
   """
-  secret_contains: String
+  content_contains: String
   """
   All values not containing the given string.
   """
-  secret_not_contains: String
+  content_not_contains: String
   """
   All values starting with the given string.
   """
-  secret_starts_with: String
+  content_starts_with: String
   """
   All values not starting with the given string.
   """
-  secret_not_starts_with: String
+  content_not_starts_with: String
   """
   All values ending with the given string.
   """
-  secret_ends_with: String
+  content_ends_with: String
   """
   All values not ending with the given string.
   """
-  secret_not_ends_with: String
-  size: Int
-  """
-  All values that are not equal to given value.
-  """
-  size_not: Int
-  """
-  All values that are contained in given list.
-  """
-  size_in: [Int!]
-  """
-  All values that are not contained in given list.
-  """
-  size_not_in: [Int!]
-  """
-  All values less than the given value.
-  """
-  size_lt: Int
-  """
-  All values less than or equal the given value.
-  """
-  size_lte: Int
-  """
-  All values greater than the given value.
-  """
-  size_gt: Int
-  """
-  All values greater than or equal the given value.
-  """
-  size_gte: Int
+  content_not_ends_with: String
   updatedAt: DateTime
   """
   All values that are not equal to given value.
@@ -1070,65 +982,40 @@ input FileWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  url: String
+  createdAt: DateTime
   """
   All values that are not equal to given value.
   """
-  url_not: String
+  createdAt_not: DateTime
   """
   All values that are contained in given list.
   """
-  url_in: [String!]
+  createdAt_in: [DateTime!]
   """
   All values that are not contained in given list.
   """
-  url_not_in: [String!]
+  createdAt_not_in: [DateTime!]
   """
   All values less than the given value.
   """
-  url_lt: String
+  createdAt_lt: DateTime
   """
   All values less than or equal the given value.
   """
-  url_lte: String
+  createdAt_lte: DateTime
   """
   All values greater than the given value.
   """
-  url_gt: String
+  createdAt_gt: DateTime
   """
   All values greater than or equal the given value.
   """
-  url_gte: String
-  """
-  All values containing the given string.
-  """
-  url_contains: String
-  """
-  All values not containing the given string.
-  """
-  url_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  url_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  url_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  url_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  url_not_ends_with: String
+  createdAt_gte: DateTime
+  message: MessageWhereInput
 }
 
 input FileWhereUniqueInput {
   id: ID
-  secret: String
-  url: String
 }
 
 """
@@ -1153,13 +1040,16 @@ type MessageConnection {
 }
 
 input MessageCreateInput {
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: FileCreateManyWithoutMessageInput
   conversation: ConversationCreateOneWithoutMessagesInput
 }
 
@@ -1168,14 +1058,35 @@ input MessageCreateManyWithoutConversationInput {
   connect: [MessageWhereUniqueInput!]
 }
 
+input MessageCreateOneWithoutFilesInput {
+  create: MessageCreateWithoutFilesInput
+  connect: MessageWhereUniqueInput
+}
+
 input MessageCreateWithoutConversationInput {
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: FileCreateManyWithoutMessageInput
+}
+
+input MessageCreateWithoutFilesInput {
+  userSent: Boolean!
+  androidMsgId: String!
+  address: String!
+  sender: String!
+  read: Boolean!
+  body: String!
+  threadId: Int!
+  error: Boolean!
+  date: DateTime!
+  conversation: ConversationCreateOneWithoutMessagesInput
 }
 
 """
@@ -1195,10 +1106,14 @@ type MessageEdge {
 enum MessageOrderByInput {
   id_ASC
   id_DESC
-  creator_ASC
-  creator_DESC
+  userSent_ASC
+  userSent_DESC
+  androidMsgId_ASC
+  androidMsgId_DESC
   address_ASC
   address_DESC
+  sender_ASC
+  sender_DESC
   read_ASC
   read_DESC
   body_ASC
@@ -1217,8 +1132,10 @@ enum MessageOrderByInput {
 
 type MessagePreviousValues {
   id: ID!
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
@@ -1264,13 +1181,16 @@ input MessageSubscriptionWhereInput {
 }
 
 input MessageUpdateInput {
-  creator: String
+  userSent: Boolean
+  androidMsgId: String
   address: String
+  sender: String
   read: Boolean
   body: String
   threadId: Int
   error: Boolean
   date: DateTime
+  files: FileUpdateManyWithoutMessageInput
   conversation: ConversationUpdateOneWithoutMessagesInput
 }
 
@@ -1283,14 +1203,26 @@ input MessageUpdateManyWithoutConversationInput {
   upsert: [MessageUpsertWithoutConversationInput!]
 }
 
+input MessageUpdateOneWithoutFilesInput {
+  create: MessageCreateWithoutFilesInput
+  connect: MessageWhereUniqueInput
+  disconnect: MessageWhereUniqueInput
+  delete: MessageWhereUniqueInput
+  update: MessageUpdateWithoutFilesInput
+  upsert: MessageUpsertWithoutFilesInput
+}
+
 input MessageUpdateWithoutConversationDataInput {
-  creator: String
+  userSent: Boolean
+  androidMsgId: String
   address: String
+  sender: String
   read: Boolean
   body: String
   threadId: Int
   error: Boolean
   date: DateTime
+  files: FileUpdateManyWithoutMessageInput
 }
 
 input MessageUpdateWithoutConversationInput {
@@ -1298,10 +1230,34 @@ input MessageUpdateWithoutConversationInput {
   data: MessageUpdateWithoutConversationDataInput!
 }
 
+input MessageUpdateWithoutFilesDataInput {
+  userSent: Boolean
+  androidMsgId: String
+  address: String
+  sender: String
+  read: Boolean
+  body: String
+  threadId: Int
+  error: Boolean
+  date: DateTime
+  conversation: ConversationUpdateOneWithoutMessagesInput
+}
+
+input MessageUpdateWithoutFilesInput {
+  where: MessageWhereUniqueInput!
+  data: MessageUpdateWithoutFilesDataInput!
+}
+
 input MessageUpsertWithoutConversationInput {
   where: MessageWhereUniqueInput!
   update: MessageUpdateWithoutConversationDataInput!
   create: MessageCreateWithoutConversationInput!
+}
+
+input MessageUpsertWithoutFilesInput {
+  where: MessageWhereUniqueInput!
+  update: MessageUpdateWithoutFilesDataInput!
+  create: MessageCreateWithoutFilesInput!
 }
 
 input MessageWhereInput {
@@ -1366,59 +1322,64 @@ input MessageWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
-  creator: String
+  userSent: Boolean
   """
   All values that are not equal to given value.
   """
-  creator_not: String
+  userSent_not: Boolean
+  androidMsgId: String
+  """
+  All values that are not equal to given value.
+  """
+  androidMsgId_not: String
   """
   All values that are contained in given list.
   """
-  creator_in: [String!]
+  androidMsgId_in: [String!]
   """
   All values that are not contained in given list.
   """
-  creator_not_in: [String!]
+  androidMsgId_not_in: [String!]
   """
   All values less than the given value.
   """
-  creator_lt: String
+  androidMsgId_lt: String
   """
   All values less than or equal the given value.
   """
-  creator_lte: String
+  androidMsgId_lte: String
   """
   All values greater than the given value.
   """
-  creator_gt: String
+  androidMsgId_gt: String
   """
   All values greater than or equal the given value.
   """
-  creator_gte: String
+  androidMsgId_gte: String
   """
   All values containing the given string.
   """
-  creator_contains: String
+  androidMsgId_contains: String
   """
   All values not containing the given string.
   """
-  creator_not_contains: String
+  androidMsgId_not_contains: String
   """
   All values starting with the given string.
   """
-  creator_starts_with: String
+  androidMsgId_starts_with: String
   """
   All values not starting with the given string.
   """
-  creator_not_starts_with: String
+  androidMsgId_not_starts_with: String
   """
   All values ending with the given string.
   """
-  creator_ends_with: String
+  androidMsgId_ends_with: String
   """
   All values not ending with the given string.
   """
-  creator_not_ends_with: String
+  androidMsgId_not_ends_with: String
   address: String
   """
   All values that are not equal to given value.
@@ -1472,6 +1433,59 @@ input MessageWhereInput {
   All values not ending with the given string.
   """
   address_not_ends_with: String
+  sender: String
+  """
+  All values that are not equal to given value.
+  """
+  sender_not: String
+  """
+  All values that are contained in given list.
+  """
+  sender_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  sender_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  sender_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  sender_lte: String
+  """
+  All values greater than the given value.
+  """
+  sender_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  sender_gte: String
+  """
+  All values containing the given string.
+  """
+  sender_contains: String
+  """
+  All values not containing the given string.
+  """
+  sender_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  sender_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  sender_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  sender_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  sender_not_ends_with: String
   read: Boolean
   """
   All values that are not equal to given value.
@@ -1651,6 +1665,9 @@ input MessageWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
+  files_every: FileWhereInput
+  files_some: FileWhereInput
+  files_none: FileWhereInput
   conversation: ConversationWhereInput
 }
 
