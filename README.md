@@ -1,12 +1,24 @@
 <h1 align="center"><strong>New to the project?</strong></h1>
+<b>MAC</b><br/>
 
 - [Install Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
-- Install prisma with npm i -g prisma
+- Install prisma with <code>npm i -g prisma</code>
 - Run npm install
 - Run prisma deploy and choose local (Make sure you have docker installed before this step!!)
 - Run yarn dev (or npm start ) to deploy the server locally
 - yarn dev will open an in browser graphql playground where if you prefer graphiql desktop version you can use that instead
 - to open a mysql terminal to inspect the database run docker exec -it prisma-db mysql -u root --host 127.0.0.1 --port 3306 --password=graphcool
+
+<b>UBUNTU</b><br/>
+
+- [Install Docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- Ensure that node is at least version 9 by running <code>node --version</code> ([install node 9](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04))
+- Install prisma with <code>sudo npm i -g prisma</code>
+- May need to install ajv@6.0.0 with <code>npm install ajv@6.0.0</code>
+- May need to install graphql@0.13.0 with <code>npm install graphql@0.13.0</code>
+- Run npm install
+- Run prisma deploy and choose local (Make sure you have docker installed before this step!!)
+- Run <code>npm start</code> to deploy the server locally
 
 <h1 align="center"><strong>Advanced GraphQL Node Server</strong></h1>
 
