@@ -8,8 +8,7 @@ const messages = {
     let conversation = await ctx.db.query.conversations( {where: {threadId: args.threadId, user: {id: userId}}})
     // if not create a new conversation for the user
     if(conversation.length == 0) { 
-      let phoneNums = args.address.split(" ")
-      phoneNums.push(args.creator)
+      let phoneNums = args.address.trim().split(" ")
       let participants = phoneNums.map((num)=>{ return { phone: num } })
       conversation = await ctx.db.mutation.createConversation( {
         data: {
@@ -26,15 +25,21 @@ const messages = {
       }) 
     }
     else conversation = conversation[0]
+    console.log(args.date)
     const message = await ctx.db.mutation.createMessage( {
       data: {
         address: args.address,
-        creator: args.creator,
+        androidMsgId: args.androidMsgId,
+        userSent: args.userSent,
+        sender: args.sender,
         body: args.body,
         read: args.read,
         error: args.error,
         date: args.date,
         threadId: args.threadId,
+        files: {
+          create: args.files
+        },
         conversation: {
           connect: {
             id: conversation.id
@@ -47,22 +52,13 @@ const messages = {
 
   async createMessages(parent, args, ctx, info){
     const userId = getUserId(ctx)
-    const promises = args.messages.map((message) => {
-      console.log(JSON.stringify(message))
-      return messages.createMessage(parent, message, ctx, info)
-    })
-    return await Promise.all(promises).then(() => {
+    for(let x = 0; x < args.messages.length; x++){
+      await messages.createMessage(parent, args.messages[x], ctx, info)
+    }
       return {
         success: true,
         status: `${args.messages.length} messages uploaded`
       }
-    })
-    .catch((err)=>{
-      return {
-        success: true,
-        status: `Error: ${err}. Talk to your server guru.`
-      }
-    })
   },
 
   async updateMessage(parent, args, ctx, info) {
@@ -102,4 +98,7 @@ const messages = {
 
 }
 
-module.exports = { messages }
+module.exports = { messages} 
+
+
+
