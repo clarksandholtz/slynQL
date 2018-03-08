@@ -2,7 +2,8 @@ type File @model {
   id: ID! @unique
   message: Message @relation(name: "FileInMessage")
   contentType: String!
-  content: String! 
+  content: String! @unique
+  uploaded: Boolean @default(value: "false")
   updatedAt: DateTime!
   createdAt: DateTime!
 }

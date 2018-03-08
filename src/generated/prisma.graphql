@@ -20,6 +20,7 @@ type File implements Node {
   message(where: MessageWhereInput): Message
   contentType: String!
   content: String!
+  uploaded: Boolean
   updatedAt: DateTime!
   createdAt: DateTime!
 }
@@ -671,6 +672,7 @@ type FileConnection {
 input FileCreateInput {
   contentType: String!
   content: String!
+  uploaded: Boolean
   message: MessageCreateOneWithoutFilesInput
 }
 
@@ -682,6 +684,7 @@ input FileCreateManyWithoutMessageInput {
 input FileCreateWithoutMessageInput {
   contentType: String!
   content: String!
+  uploaded: Boolean
 }
 
 """
@@ -705,6 +708,8 @@ enum FileOrderByInput {
   contentType_DESC
   content_ASC
   content_DESC
+  uploaded_ASC
+  uploaded_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -715,6 +720,7 @@ type FilePreviousValues {
   id: ID!
   contentType: String!
   content: String!
+  uploaded: Boolean
   updatedAt: DateTime!
   createdAt: DateTime!
 }
@@ -757,6 +763,7 @@ input FileSubscriptionWhereInput {
 input FileUpdateInput {
   contentType: String
   content: String
+  uploaded: Boolean
   message: MessageUpdateOneWithoutFilesInput
 }
 
@@ -772,6 +779,7 @@ input FileUpdateManyWithoutMessageInput {
 input FileUpdateWithoutMessageDataInput {
   contentType: String
   content: String
+  uploaded: Boolean
 }
 
 input FileUpdateWithoutMessageInput {
@@ -953,6 +961,11 @@ input FileWhereInput {
   All values not ending with the given string.
   """
   content_not_ends_with: String
+  uploaded: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  uploaded_not: Boolean
   updatedAt: DateTime
   """
   All values that are not equal to given value.
@@ -1016,6 +1029,7 @@ input FileWhereInput {
 
 input FileWhereUniqueInput {
   id: ID
+  content: String
 }
 
 """
