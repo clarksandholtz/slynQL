@@ -25,7 +25,6 @@ const messages = {
       }) 
     }
     else conversation = conversation[0]
-    console.log(args.date)
     const message = await ctx.db.mutation.createMessage( {
       data: {
         address: args.address,
@@ -99,6 +98,3 @@ const messages = {
 }
 
 module.exports = { messages} 
-
-
-

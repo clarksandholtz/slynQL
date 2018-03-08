@@ -1,4 +1,4 @@
-# import User, Conversation, Message, Notification, Subscription from './generated/prisma.graphql'
+# import User, Conversation, Message, Notification from './generated/prisma.graphql'
 
 type Query {
   allConversations: [Conversation]
@@ -17,12 +17,6 @@ type Mutation {
   deleteAllMessages: BatchPayload!
   createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
 }
-
-# type Subscription {
-  # me: User
-  # conversation(id: ID!): Conversation!
-  # message(id: ID!): Message!
-# }
 
 type AuthPayload {
   token: String!
