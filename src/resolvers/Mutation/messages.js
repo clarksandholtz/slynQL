@@ -54,10 +54,11 @@ const messages = {
     for(let x = 0; x < args.messages.length; x++){
       await messages.createMessage(parent, args.messages[x], ctx, info)
     }
-      return {
-        success: true,
-        status: `${args.messages.length} messages uploaded`
-      }
+    console.log("LENGTH: " + args.messages.length)
+    return {
+      success: true,
+      status: `${args.messages.length} messages uploaded`
+    }
   },
 
   async updateMessage(parent, args, ctx, info) {

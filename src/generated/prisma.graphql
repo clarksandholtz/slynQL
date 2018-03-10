@@ -417,25 +417,25 @@ input ConversationUpdateManyWithoutUserInput {
   connect: [ConversationWhereUniqueInput!]
   disconnect: [ConversationWhereUniqueInput!]
   delete: [ConversationWhereUniqueInput!]
-  update: [ConversationUpdateWithoutUserInput!]
-  upsert: [ConversationUpsertWithoutUserInput!]
+  update: [ConversationUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [ConversationUpsertWithWhereUniqueWithoutUserInput!]
 }
 
 input ConversationUpdateOneWithoutMessagesInput {
   create: ConversationCreateWithoutMessagesInput
   connect: ConversationWhereUniqueInput
-  disconnect: ConversationWhereUniqueInput
-  delete: ConversationWhereUniqueInput
-  update: ConversationUpdateWithoutMessagesInput
+  disconnect: Boolean
+  delete: Boolean
+  update: ConversationUpdateWithoutMessagesDataInput
   upsert: ConversationUpsertWithoutMessagesInput
 }
 
 input ConversationUpdateOneWithoutParticipantsInput {
   create: ConversationCreateWithoutParticipantsInput
   connect: ConversationWhereUniqueInput
-  disconnect: ConversationWhereUniqueInput
-  delete: ConversationWhereUniqueInput
-  update: ConversationUpdateWithoutParticipantsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: ConversationUpdateWithoutParticipantsDataInput
   upsert: ConversationUpsertWithoutParticipantsInput
 }
 
@@ -445,20 +445,10 @@ input ConversationUpdateWithoutMessagesDataInput {
   participants: ContactUpdateManyWithoutConversationInput
 }
 
-input ConversationUpdateWithoutMessagesInput {
-  where: ConversationWhereUniqueInput!
-  data: ConversationUpdateWithoutMessagesDataInput!
-}
-
 input ConversationUpdateWithoutParticipantsDataInput {
   threadId: Int
   messages: MessageUpdateManyWithoutConversationInput
   user: UserUpdateOneWithoutConversationsInput
-}
-
-input ConversationUpdateWithoutParticipantsInput {
-  where: ConversationWhereUniqueInput!
-  data: ConversationUpdateWithoutParticipantsDataInput!
 }
 
 input ConversationUpdateWithoutUserDataInput {
@@ -467,24 +457,22 @@ input ConversationUpdateWithoutUserDataInput {
   participants: ContactUpdateManyWithoutConversationInput
 }
 
-input ConversationUpdateWithoutUserInput {
+input ConversationUpdateWithWhereUniqueWithoutUserInput {
   where: ConversationWhereUniqueInput!
   data: ConversationUpdateWithoutUserDataInput!
 }
 
 input ConversationUpsertWithoutMessagesInput {
-  where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutMessagesDataInput!
   create: ConversationCreateWithoutMessagesInput!
 }
 
 input ConversationUpsertWithoutParticipantsInput {
-  where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutParticipantsDataInput!
   create: ConversationCreateWithoutParticipantsInput!
 }
 
-input ConversationUpsertWithoutUserInput {
+input ConversationUpsertWithWhereUniqueWithoutUserInput {
   where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutUserDataInput!
   create: ConversationCreateWithoutUserInput!
@@ -772,8 +760,8 @@ input FileUpdateManyWithoutMessageInput {
   connect: [FileWhereUniqueInput!]
   disconnect: [FileWhereUniqueInput!]
   delete: [FileWhereUniqueInput!]
-  update: [FileUpdateWithoutMessageInput!]
-  upsert: [FileUpsertWithoutMessageInput!]
+  update: [FileUpdateWithWhereUniqueWithoutMessageInput!]
+  upsert: [FileUpsertWithWhereUniqueWithoutMessageInput!]
 }
 
 input FileUpdateWithoutMessageDataInput {
@@ -782,12 +770,12 @@ input FileUpdateWithoutMessageDataInput {
   uploaded: Boolean
 }
 
-input FileUpdateWithoutMessageInput {
+input FileUpdateWithWhereUniqueWithoutMessageInput {
   where: FileWhereUniqueInput!
   data: FileUpdateWithoutMessageDataInput!
 }
 
-input FileUpsertWithoutMessageInput {
+input FileUpsertWithWhereUniqueWithoutMessageInput {
   where: FileWhereUniqueInput!
   update: FileUpdateWithoutMessageDataInput!
   create: FileCreateWithoutMessageInput!
@@ -1213,16 +1201,16 @@ input MessageUpdateManyWithoutConversationInput {
   connect: [MessageWhereUniqueInput!]
   disconnect: [MessageWhereUniqueInput!]
   delete: [MessageWhereUniqueInput!]
-  update: [MessageUpdateWithoutConversationInput!]
-  upsert: [MessageUpsertWithoutConversationInput!]
+  update: [MessageUpdateWithWhereUniqueWithoutConversationInput!]
+  upsert: [MessageUpsertWithWhereUniqueWithoutConversationInput!]
 }
 
 input MessageUpdateOneWithoutFilesInput {
   create: MessageCreateWithoutFilesInput
   connect: MessageWhereUniqueInput
-  disconnect: MessageWhereUniqueInput
-  delete: MessageWhereUniqueInput
-  update: MessageUpdateWithoutFilesInput
+  disconnect: Boolean
+  delete: Boolean
+  update: MessageUpdateWithoutFilesDataInput
   upsert: MessageUpsertWithoutFilesInput
 }
 
@@ -1239,11 +1227,6 @@ input MessageUpdateWithoutConversationDataInput {
   files: FileUpdateManyWithoutMessageInput
 }
 
-input MessageUpdateWithoutConversationInput {
-  where: MessageWhereUniqueInput!
-  data: MessageUpdateWithoutConversationDataInput!
-}
-
 input MessageUpdateWithoutFilesDataInput {
   userSent: Boolean
   androidMsgId: String
@@ -1257,21 +1240,20 @@ input MessageUpdateWithoutFilesDataInput {
   conversation: ConversationUpdateOneWithoutMessagesInput
 }
 
-input MessageUpdateWithoutFilesInput {
+input MessageUpdateWithWhereUniqueWithoutConversationInput {
   where: MessageWhereUniqueInput!
-  data: MessageUpdateWithoutFilesDataInput!
-}
-
-input MessageUpsertWithoutConversationInput {
-  where: MessageWhereUniqueInput!
-  update: MessageUpdateWithoutConversationDataInput!
-  create: MessageCreateWithoutConversationInput!
+  data: MessageUpdateWithoutConversationDataInput!
 }
 
 input MessageUpsertWithoutFilesInput {
-  where: MessageWhereUniqueInput!
   update: MessageUpdateWithoutFilesDataInput!
   create: MessageCreateWithoutFilesInput!
+}
+
+input MessageUpsertWithWhereUniqueWithoutConversationInput {
+  where: MessageWhereUniqueInput!
+  update: MessageUpdateWithoutConversationDataInput!
+  create: MessageCreateWithoutConversationInput!
 }
 
 input MessageWhereInput {
@@ -1901,9 +1883,9 @@ input NotificationGroupUpdateInput {
 input NotificationGroupUpdateOneWithoutNotificationsInput {
   create: NotificationGroupCreateWithoutNotificationsInput
   connect: NotificationGroupWhereUniqueInput
-  disconnect: NotificationGroupWhereUniqueInput
-  delete: NotificationGroupWhereUniqueInput
-  update: NotificationGroupUpdateWithoutNotificationsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: NotificationGroupUpdateWithoutNotificationsDataInput
   upsert: NotificationGroupUpsertWithoutNotificationsInput
 }
 
@@ -1911,13 +1893,7 @@ input NotificationGroupUpdateWithoutNotificationsDataInput {
   user: UserUpdateOneInput
 }
 
-input NotificationGroupUpdateWithoutNotificationsInput {
-  where: NotificationGroupWhereUniqueInput!
-  data: NotificationGroupUpdateWithoutNotificationsDataInput!
-}
-
 input NotificationGroupUpsertWithoutNotificationsInput {
-  where: NotificationGroupWhereUniqueInput!
   update: NotificationGroupUpdateWithoutNotificationsDataInput!
   create: NotificationGroupCreateWithoutNotificationsInput!
 }
@@ -2129,8 +2105,8 @@ input NotificationUpdateManyWithoutNotificationGroupInput {
   connect: [NotificationWhereUniqueInput!]
   disconnect: [NotificationWhereUniqueInput!]
   delete: [NotificationWhereUniqueInput!]
-  update: [NotificationUpdateWithoutNotificationGroupInput!]
-  upsert: [NotificationUpsertWithoutNotificationGroupInput!]
+  update: [NotificationUpdateWithWhereUniqueWithoutNotificationGroupInput!]
+  upsert: [NotificationUpsertWithWhereUniqueWithoutNotificationGroupInput!]
 }
 
 input NotificationUpdateWithoutNotificationGroupDataInput {
@@ -2140,12 +2116,12 @@ input NotificationUpdateWithoutNotificationGroupDataInput {
   actions: NotificationUpdateactionsInput
 }
 
-input NotificationUpdateWithoutNotificationGroupInput {
+input NotificationUpdateWithWhereUniqueWithoutNotificationGroupInput {
   where: NotificationWhereUniqueInput!
   data: NotificationUpdateWithoutNotificationGroupDataInput!
 }
 
-input NotificationUpsertWithoutNotificationGroupInput {
+input NotificationUpsertWithWhereUniqueWithoutNotificationGroupInput {
   where: NotificationWhereUniqueInput!
   update: NotificationUpdateWithoutNotificationGroupDataInput!
   create: NotificationCreateWithoutNotificationGroupInput!
@@ -2559,26 +2535,21 @@ input UserUpdateInput {
   conversations: ConversationUpdateManyWithoutUserInput
 }
 
-input UserUpdateNestedInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateDataInput!
-}
-
 input UserUpdateOneInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
-  disconnect: UserWhereUniqueInput
-  delete: UserWhereUniqueInput
-  update: UserUpdateNestedInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateDataInput
   upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutConversationsInput {
   create: UserCreateWithoutConversationsInput
   connect: UserWhereUniqueInput
-  disconnect: UserWhereUniqueInput
-  delete: UserWhereUniqueInput
-  update: UserUpdateWithoutConversationsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutConversationsDataInput
   upsert: UserUpsertWithoutConversationsInput
 }
 
@@ -2589,19 +2560,12 @@ input UserUpdateWithoutConversationsDataInput {
   phone: String
 }
 
-input UserUpdateWithoutConversationsInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateWithoutConversationsDataInput!
-}
-
 input UserUpsertNestedInput {
-  where: UserWhereUniqueInput!
   update: UserUpdateDataInput!
   create: UserCreateInput!
 }
 
 input UserUpsertWithoutConversationsInput {
-  where: UserWhereUniqueInput!
   update: UserUpdateWithoutConversationsDataInput!
   create: UserCreateWithoutConversationsInput!
 }
