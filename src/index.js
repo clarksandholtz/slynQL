@@ -3,7 +3,7 @@ const { Prisma } = require('prisma-binding')
 const resolvers = require('./resolvers')
 const fs = require('fs')
 const bodyParser = require('body-parser');
-//const getUserIdFromAuthorization = require('../src/utils')
+const { getUserIdFromAuthorization } = require('./utils')
 
 const db = new Prisma({
   typeDefs: `src/generated/prisma.graphql`,
@@ -26,17 +26,18 @@ server.express.use(bodyParser.json({ type: 'application/json', limit: '50mb' }))
 
 server.express.post('/upload/image',  (req, res, next)=>{
   // Upload as type base64 and save to the Images directory under a sepcial name
-  //getUserIdFromAuthorization(req.get("Authorization")) 
-  let base64String = req.body.content
-  //let base64Image = base64String.split(';base64,').pop();
-  console.log(req.body)
-  let name = req.body.name
-  fs.writeFile(__dirname + "/../Images/"+ name, base64String, {encoding: 'base64'}, function(err) {
+  getUserIdFromAuthorization(req.get("Authorization"))
+  if(!req.body.name || !req.body.content){
+    res.send("Name or Content Missing")
+    res.sendStatus(400)
+    return
+  }
+  fs.writeFile(__dirname + "/../Images/"+ req.body.name, req.body.content, {encoding: 'base64'}, function(err) {
     if(err){
       console.log(err)
     } else{
       res.sendStatus(200)
-      db.mutation.updateFile({data: {uploaded: true}, where: {content: name}})
+      db.mutation.updateFile({data: {uploaded: true}, where: {content: req.body.name}})
     }
   });
   
@@ -44,7 +45,7 @@ server.express.post('/upload/image',  (req, res, next)=>{
 
 server.express.get('/download/image', (req, res, next)=>{
   // This endpont will delete the images after downloading them off of the server
-  //getUserIdFromAuthorization(req.get("Authorization"))
+  getUserIdFromAuthorization(req.get("Authorization"))
   var file = __dirname + '/../Images/' + req.query.name
   res.download(file, (err)=>{ 
     if(err){ // display error if there was an error deleting the file
@@ -59,6 +60,7 @@ server.express.get('/download/image', (req, res, next)=>{
       });
     }
   })
+  res.sendStatus(200)
 })
 
 server.start(() => console.log('Server is running on http://localhost:4000'))

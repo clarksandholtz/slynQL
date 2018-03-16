@@ -10,12 +10,15 @@ type Mutation {
   login(email: String!, uid: String!): AuthPayload!
 
   createMessage(androidMsgId: String!, sender: String!, address: String!, userSent: Boolean!, body: String!, read: Boolean!, threadId: Int!, date: String!, error: Boolean!, files: [FileCreateInput]): Message!
+  sendMessage(address: String!, body: String!, files: [FileCreateInput!]): PendingMessage
   updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
-  deleteMessage(id: ID!): Message!
+  createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
 
+  markThreadAsRead(threadId: Int!): BatchPayload!
+
+  deleteMessage(id: ID!): Message!
   deleteConversation(id: ID!): Conversation!
   deleteAllMessages: BatchPayload!
-  createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
 }
 
 type AuthPayload {

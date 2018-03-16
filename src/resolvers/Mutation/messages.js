@@ -46,6 +46,17 @@ const messages = {
         }
       }
     })
+    //Check to see if there is a pending message and delete it if there is
+    const pendingMessages = await ctx.db.query.pendingMessages({
+      where:{
+        address: message.address,
+        body: message.body,
+        user: {id: userId}
+      }
+    })
+    if(pendingMessages && pendingMessages.length > 0){ // If there are duplicate messages with same body and address this will delete one as a time as they are sent
+      await ctx.db.mutation.deletePendingMessage({ where:{ id: pendingMessages[0].id } })
+    }
     return message
   },
 
@@ -59,6 +70,17 @@ const messages = {
       success: true,
       status: `${args.messages.length} messages uploaded`
     }
+  },
+  
+  async sendMessage(parent, args, ctx, info){
+    const userId = getUserId(ctx)
+    await ctx.db.mutation.createPendingMessage({
+      data: {
+        address: args.address,
+        body: args.body,
+        files: args.files
+      }
+    })
   },
 
   async updateMessage(parent, args, ctx, info) {
