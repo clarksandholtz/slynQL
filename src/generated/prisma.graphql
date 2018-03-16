@@ -16,25 +16,28 @@ type Conversation implements Node {
 }
 
 type File implements Node {
-  contentType: String!
-  createdAt: DateTime!
   id: ID!
-  name: String!
-  secret: String!
-  size: Int!
+  message(where: MessageWhereInput): Message
+  pendingMessage(where: PendingMessageWhereInput): PendingMessage
+  contentType: String!
+  content: String!
+  uploaded: Boolean
   updatedAt: DateTime!
-  url: String!
+  createdAt: DateTime!
 }
 
 type Message implements Node {
   id: ID!
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
   conversation(where: ConversationWhereInput): Conversation
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -59,6 +62,17 @@ type NotificationGroup implements Node {
   updatedAt: DateTime!
 }
 
+type PendingMessage implements Node {
+  id: ID!
+  address: String!
+  body: String!
+  error: Boolean
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
+  user(where: UserWhereInput): User
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type User implements Node {
   id: ID!
   name: String!
@@ -66,6 +80,7 @@ type User implements Node {
   uid: String!
   phone: String!
   conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation!]
+  pendingMessages(where: PendingMessageWhereInput, orderBy: PendingMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [PendingMessage!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -96,6 +111,10 @@ type AggregateNotification {
 }
 
 type AggregateNotificationGroup {
+  count: Int!
+}
+
+type AggregatePendingMessage {
   count: Int!
 }
 
@@ -415,25 +434,25 @@ input ConversationUpdateManyWithoutUserInput {
   connect: [ConversationWhereUniqueInput!]
   disconnect: [ConversationWhereUniqueInput!]
   delete: [ConversationWhereUniqueInput!]
-  update: [ConversationUpdateWithoutUserInput!]
-  upsert: [ConversationUpsertWithoutUserInput!]
+  update: [ConversationUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [ConversationUpsertWithWhereUniqueWithoutUserInput!]
 }
 
 input ConversationUpdateOneWithoutMessagesInput {
   create: ConversationCreateWithoutMessagesInput
   connect: ConversationWhereUniqueInput
-  disconnect: ConversationWhereUniqueInput
-  delete: ConversationWhereUniqueInput
-  update: ConversationUpdateWithoutMessagesInput
+  disconnect: Boolean
+  delete: Boolean
+  update: ConversationUpdateWithoutMessagesDataInput
   upsert: ConversationUpsertWithoutMessagesInput
 }
 
 input ConversationUpdateOneWithoutParticipantsInput {
   create: ConversationCreateWithoutParticipantsInput
   connect: ConversationWhereUniqueInput
-  disconnect: ConversationWhereUniqueInput
-  delete: ConversationWhereUniqueInput
-  update: ConversationUpdateWithoutParticipantsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: ConversationUpdateWithoutParticipantsDataInput
   upsert: ConversationUpsertWithoutParticipantsInput
 }
 
@@ -443,20 +462,10 @@ input ConversationUpdateWithoutMessagesDataInput {
   participants: ContactUpdateManyWithoutConversationInput
 }
 
-input ConversationUpdateWithoutMessagesInput {
-  where: ConversationWhereUniqueInput!
-  data: ConversationUpdateWithoutMessagesDataInput!
-}
-
 input ConversationUpdateWithoutParticipantsDataInput {
   threadId: Int
   messages: MessageUpdateManyWithoutConversationInput
   user: UserUpdateOneWithoutConversationsInput
-}
-
-input ConversationUpdateWithoutParticipantsInput {
-  where: ConversationWhereUniqueInput!
-  data: ConversationUpdateWithoutParticipantsDataInput!
 }
 
 input ConversationUpdateWithoutUserDataInput {
@@ -465,24 +474,22 @@ input ConversationUpdateWithoutUserDataInput {
   participants: ContactUpdateManyWithoutConversationInput
 }
 
-input ConversationUpdateWithoutUserInput {
+input ConversationUpdateWithWhereUniqueWithoutUserInput {
   where: ConversationWhereUniqueInput!
   data: ConversationUpdateWithoutUserDataInput!
 }
 
 input ConversationUpsertWithoutMessagesInput {
-  where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutMessagesDataInput!
   create: ConversationCreateWithoutMessagesInput!
 }
 
 input ConversationUpsertWithoutParticipantsInput {
-  where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutParticipantsDataInput!
   create: ConversationCreateWithoutParticipantsInput!
 }
 
-input ConversationUpsertWithoutUserInput {
+input ConversationUpsertWithWhereUniqueWithoutUserInput {
   where: ConversationWhereUniqueInput!
   update: ConversationUpdateWithoutUserDataInput!
   create: ConversationCreateWithoutUserInput!
@@ -669,10 +676,34 @@ type FileConnection {
 
 input FileCreateInput {
   contentType: String!
-  name: String!
-  secret: String!
-  size: Int!
-  url: String!
+  content: String!
+  uploaded: Boolean
+  message: MessageCreateOneWithoutFilesInput
+  pendingMessage: PendingMessageCreateOneWithoutFilesInput
+}
+
+input FileCreateManyWithoutMessageInput {
+  create: [FileCreateWithoutMessageInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileCreateManyWithoutPendingMessageInput {
+  create: [FileCreateWithoutPendingMessageInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileCreateWithoutMessageInput {
+  contentType: String!
+  content: String!
+  uploaded: Boolean
+  pendingMessage: PendingMessageCreateOneWithoutFilesInput
+}
+
+input FileCreateWithoutPendingMessageInput {
+  contentType: String!
+  content: String!
+  uploaded: Boolean
+  message: MessageCreateOneWithoutFilesInput
 }
 
 """
@@ -690,33 +721,27 @@ type FileEdge {
 }
 
 enum FileOrderByInput {
-  contentType_ASC
-  contentType_DESC
-  createdAt_ASC
-  createdAt_DESC
   id_ASC
   id_DESC
-  name_ASC
-  name_DESC
-  secret_ASC
-  secret_DESC
-  size_ASC
-  size_DESC
+  contentType_ASC
+  contentType_DESC
+  content_ASC
+  content_DESC
+  uploaded_ASC
+  uploaded_DESC
   updatedAt_ASC
   updatedAt_DESC
-  url_ASC
-  url_DESC
+  createdAt_ASC
+  createdAt_DESC
 }
 
 type FilePreviousValues {
-  contentType: String!
-  createdAt: DateTime!
   id: ID!
-  name: String!
-  secret: String!
-  size: Int!
+  contentType: String!
+  content: String!
+  uploaded: Boolean
   updatedAt: DateTime!
-  url: String!
+  createdAt: DateTime!
 }
 
 type FileSubscriptionPayload {
@@ -756,10 +781,64 @@ input FileSubscriptionWhereInput {
 
 input FileUpdateInput {
   contentType: String
-  name: String
-  secret: String
-  size: Int
-  url: String
+  content: String
+  uploaded: Boolean
+  message: MessageUpdateOneWithoutFilesInput
+  pendingMessage: PendingMessageUpdateOneWithoutFilesInput
+}
+
+input FileUpdateManyWithoutMessageInput {
+  create: [FileCreateWithoutMessageInput!]
+  connect: [FileWhereUniqueInput!]
+  disconnect: [FileWhereUniqueInput!]
+  delete: [FileWhereUniqueInput!]
+  update: [FileUpdateWithWhereUniqueWithoutMessageInput!]
+  upsert: [FileUpsertWithWhereUniqueWithoutMessageInput!]
+}
+
+input FileUpdateManyWithoutPendingMessageInput {
+  create: [FileCreateWithoutPendingMessageInput!]
+  connect: [FileWhereUniqueInput!]
+  disconnect: [FileWhereUniqueInput!]
+  delete: [FileWhereUniqueInput!]
+  update: [FileUpdateWithWhereUniqueWithoutPendingMessageInput!]
+  upsert: [FileUpsertWithWhereUniqueWithoutPendingMessageInput!]
+}
+
+input FileUpdateWithoutMessageDataInput {
+  contentType: String
+  content: String
+  uploaded: Boolean
+  pendingMessage: PendingMessageUpdateOneWithoutFilesInput
+}
+
+input FileUpdateWithoutPendingMessageDataInput {
+  contentType: String
+  content: String
+  uploaded: Boolean
+  message: MessageUpdateOneWithoutFilesInput
+}
+
+input FileUpdateWithWhereUniqueWithoutMessageInput {
+  where: FileWhereUniqueInput!
+  data: FileUpdateWithoutMessageDataInput!
+}
+
+input FileUpdateWithWhereUniqueWithoutPendingMessageInput {
+  where: FileWhereUniqueInput!
+  data: FileUpdateWithoutPendingMessageDataInput!
+}
+
+input FileUpsertWithWhereUniqueWithoutMessageInput {
+  where: FileWhereUniqueInput!
+  update: FileUpdateWithoutMessageDataInput!
+  create: FileCreateWithoutMessageInput!
+}
+
+input FileUpsertWithWhereUniqueWithoutPendingMessageInput {
+  where: FileWhereUniqueInput!
+  update: FileUpdateWithoutPendingMessageDataInput!
+  create: FileCreateWithoutPendingMessageInput!
 }
 
 input FileWhereInput {
@@ -771,88 +850,6 @@ input FileWhereInput {
   Logical OR on all given filters.
   """
   OR: [FileWhereInput!]
-  contentType: String
-  """
-  All values that are not equal to given value.
-  """
-  contentType_not: String
-  """
-  All values that are contained in given list.
-  """
-  contentType_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  contentType_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  contentType_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  contentType_lte: String
-  """
-  All values greater than the given value.
-  """
-  contentType_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  contentType_gte: String
-  """
-  All values containing the given string.
-  """
-  contentType_contains: String
-  """
-  All values not containing the given string.
-  """
-  contentType_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  contentType_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  contentType_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  contentType_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  contentType_not_ends_with: String
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
   id: ID
   """
   All values that are not equal to given value.
@@ -906,141 +903,117 @@ input FileWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
-  name: String
+  contentType: String
   """
   All values that are not equal to given value.
   """
-  name_not: String
+  contentType_not: String
   """
   All values that are contained in given list.
   """
-  name_in: [String!]
+  contentType_in: [String!]
   """
   All values that are not contained in given list.
   """
-  name_not_in: [String!]
+  contentType_not_in: [String!]
   """
   All values less than the given value.
   """
-  name_lt: String
+  contentType_lt: String
   """
   All values less than or equal the given value.
   """
-  name_lte: String
+  contentType_lte: String
   """
   All values greater than the given value.
   """
-  name_gt: String
+  contentType_gt: String
   """
   All values greater than or equal the given value.
   """
-  name_gte: String
+  contentType_gte: String
   """
   All values containing the given string.
   """
-  name_contains: String
+  contentType_contains: String
   """
   All values not containing the given string.
   """
-  name_not_contains: String
+  contentType_not_contains: String
   """
   All values starting with the given string.
   """
-  name_starts_with: String
+  contentType_starts_with: String
   """
   All values not starting with the given string.
   """
-  name_not_starts_with: String
+  contentType_not_starts_with: String
   """
   All values ending with the given string.
   """
-  name_ends_with: String
+  contentType_ends_with: String
   """
   All values not ending with the given string.
   """
-  name_not_ends_with: String
-  secret: String
+  contentType_not_ends_with: String
+  content: String
   """
   All values that are not equal to given value.
   """
-  secret_not: String
+  content_not: String
   """
   All values that are contained in given list.
   """
-  secret_in: [String!]
+  content_in: [String!]
   """
   All values that are not contained in given list.
   """
-  secret_not_in: [String!]
+  content_not_in: [String!]
   """
   All values less than the given value.
   """
-  secret_lt: String
+  content_lt: String
   """
   All values less than or equal the given value.
   """
-  secret_lte: String
+  content_lte: String
   """
   All values greater than the given value.
   """
-  secret_gt: String
+  content_gt: String
   """
   All values greater than or equal the given value.
   """
-  secret_gte: String
+  content_gte: String
   """
   All values containing the given string.
   """
-  secret_contains: String
+  content_contains: String
   """
   All values not containing the given string.
   """
-  secret_not_contains: String
+  content_not_contains: String
   """
   All values starting with the given string.
   """
-  secret_starts_with: String
+  content_starts_with: String
   """
   All values not starting with the given string.
   """
-  secret_not_starts_with: String
+  content_not_starts_with: String
   """
   All values ending with the given string.
   """
-  secret_ends_with: String
+  content_ends_with: String
   """
   All values not ending with the given string.
   """
-  secret_not_ends_with: String
-  size: Int
+  content_not_ends_with: String
+  uploaded: Boolean
   """
   All values that are not equal to given value.
   """
-  size_not: Int
-  """
-  All values that are contained in given list.
-  """
-  size_in: [Int!]
-  """
-  All values that are not contained in given list.
-  """
-  size_not_in: [Int!]
-  """
-  All values less than the given value.
-  """
-  size_lt: Int
-  """
-  All values less than or equal the given value.
-  """
-  size_lte: Int
-  """
-  All values greater than the given value.
-  """
-  size_gt: Int
-  """
-  All values greater than or equal the given value.
-  """
-  size_gte: Int
+  uploaded_not: Boolean
   updatedAt: DateTime
   """
   All values that are not equal to given value.
@@ -1070,65 +1043,42 @@ input FileWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  url: String
+  createdAt: DateTime
   """
   All values that are not equal to given value.
   """
-  url_not: String
+  createdAt_not: DateTime
   """
   All values that are contained in given list.
   """
-  url_in: [String!]
+  createdAt_in: [DateTime!]
   """
   All values that are not contained in given list.
   """
-  url_not_in: [String!]
+  createdAt_not_in: [DateTime!]
   """
   All values less than the given value.
   """
-  url_lt: String
+  createdAt_lt: DateTime
   """
   All values less than or equal the given value.
   """
-  url_lte: String
+  createdAt_lte: DateTime
   """
   All values greater than the given value.
   """
-  url_gt: String
+  createdAt_gt: DateTime
   """
   All values greater than or equal the given value.
   """
-  url_gte: String
-  """
-  All values containing the given string.
-  """
-  url_contains: String
-  """
-  All values not containing the given string.
-  """
-  url_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  url_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  url_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  url_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  url_not_ends_with: String
+  createdAt_gte: DateTime
+  message: MessageWhereInput
+  pendingMessage: PendingMessageWhereInput
 }
 
 input FileWhereUniqueInput {
   id: ID
-  secret: String
-  url: String
+  content: String
 }
 
 """
@@ -1153,13 +1103,16 @@ type MessageConnection {
 }
 
 input MessageCreateInput {
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: FileCreateManyWithoutMessageInput
   conversation: ConversationCreateOneWithoutMessagesInput
 }
 
@@ -1168,14 +1121,35 @@ input MessageCreateManyWithoutConversationInput {
   connect: [MessageWhereUniqueInput!]
 }
 
+input MessageCreateOneWithoutFilesInput {
+  create: MessageCreateWithoutFilesInput
+  connect: MessageWhereUniqueInput
+}
+
 input MessageCreateWithoutConversationInput {
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: FileCreateManyWithoutMessageInput
+}
+
+input MessageCreateWithoutFilesInput {
+  userSent: Boolean!
+  androidMsgId: String!
+  address: String!
+  sender: String!
+  read: Boolean!
+  body: String!
+  threadId: Int!
+  error: Boolean!
+  date: DateTime!
+  conversation: ConversationCreateOneWithoutMessagesInput
 }
 
 """
@@ -1195,10 +1169,14 @@ type MessageEdge {
 enum MessageOrderByInput {
   id_ASC
   id_DESC
-  creator_ASC
-  creator_DESC
+  userSent_ASC
+  userSent_DESC
+  androidMsgId_ASC
+  androidMsgId_DESC
   address_ASC
   address_DESC
+  sender_ASC
+  sender_DESC
   read_ASC
   read_DESC
   body_ASC
@@ -1217,8 +1195,10 @@ enum MessageOrderByInput {
 
 type MessagePreviousValues {
   id: ID!
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
@@ -1264,13 +1244,16 @@ input MessageSubscriptionWhereInput {
 }
 
 input MessageUpdateInput {
-  creator: String
+  userSent: Boolean
+  androidMsgId: String
   address: String
+  sender: String
   read: Boolean
   body: String
   threadId: Int
   error: Boolean
   date: DateTime
+  files: FileUpdateManyWithoutMessageInput
   conversation: ConversationUpdateOneWithoutMessagesInput
 }
 
@@ -1279,26 +1262,56 @@ input MessageUpdateManyWithoutConversationInput {
   connect: [MessageWhereUniqueInput!]
   disconnect: [MessageWhereUniqueInput!]
   delete: [MessageWhereUniqueInput!]
-  update: [MessageUpdateWithoutConversationInput!]
-  upsert: [MessageUpsertWithoutConversationInput!]
+  update: [MessageUpdateWithWhereUniqueWithoutConversationInput!]
+  upsert: [MessageUpsertWithWhereUniqueWithoutConversationInput!]
+}
+
+input MessageUpdateOneWithoutFilesInput {
+  create: MessageCreateWithoutFilesInput
+  connect: MessageWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: MessageUpdateWithoutFilesDataInput
+  upsert: MessageUpsertWithoutFilesInput
 }
 
 input MessageUpdateWithoutConversationDataInput {
-  creator: String
+  userSent: Boolean
+  androidMsgId: String
   address: String
+  sender: String
   read: Boolean
   body: String
   threadId: Int
   error: Boolean
   date: DateTime
+  files: FileUpdateManyWithoutMessageInput
 }
 
-input MessageUpdateWithoutConversationInput {
+input MessageUpdateWithoutFilesDataInput {
+  userSent: Boolean
+  androidMsgId: String
+  address: String
+  sender: String
+  read: Boolean
+  body: String
+  threadId: Int
+  error: Boolean
+  date: DateTime
+  conversation: ConversationUpdateOneWithoutMessagesInput
+}
+
+input MessageUpdateWithWhereUniqueWithoutConversationInput {
   where: MessageWhereUniqueInput!
   data: MessageUpdateWithoutConversationDataInput!
 }
 
-input MessageUpsertWithoutConversationInput {
+input MessageUpsertWithoutFilesInput {
+  update: MessageUpdateWithoutFilesDataInput!
+  create: MessageCreateWithoutFilesInput!
+}
+
+input MessageUpsertWithWhereUniqueWithoutConversationInput {
   where: MessageWhereUniqueInput!
   update: MessageUpdateWithoutConversationDataInput!
   create: MessageCreateWithoutConversationInput!
@@ -1366,59 +1379,64 @@ input MessageWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
-  creator: String
+  userSent: Boolean
   """
   All values that are not equal to given value.
   """
-  creator_not: String
+  userSent_not: Boolean
+  androidMsgId: String
+  """
+  All values that are not equal to given value.
+  """
+  androidMsgId_not: String
   """
   All values that are contained in given list.
   """
-  creator_in: [String!]
+  androidMsgId_in: [String!]
   """
   All values that are not contained in given list.
   """
-  creator_not_in: [String!]
+  androidMsgId_not_in: [String!]
   """
   All values less than the given value.
   """
-  creator_lt: String
+  androidMsgId_lt: String
   """
   All values less than or equal the given value.
   """
-  creator_lte: String
+  androidMsgId_lte: String
   """
   All values greater than the given value.
   """
-  creator_gt: String
+  androidMsgId_gt: String
   """
   All values greater than or equal the given value.
   """
-  creator_gte: String
+  androidMsgId_gte: String
   """
   All values containing the given string.
   """
-  creator_contains: String
+  androidMsgId_contains: String
   """
   All values not containing the given string.
   """
-  creator_not_contains: String
+  androidMsgId_not_contains: String
   """
   All values starting with the given string.
   """
-  creator_starts_with: String
+  androidMsgId_starts_with: String
   """
   All values not starting with the given string.
   """
-  creator_not_starts_with: String
+  androidMsgId_not_starts_with: String
   """
   All values ending with the given string.
   """
-  creator_ends_with: String
+  androidMsgId_ends_with: String
   """
   All values not ending with the given string.
   """
-  creator_not_ends_with: String
+  androidMsgId_not_ends_with: String
   address: String
   """
   All values that are not equal to given value.
@@ -1472,6 +1490,59 @@ input MessageWhereInput {
   All values not ending with the given string.
   """
   address_not_ends_with: String
+  sender: String
+  """
+  All values that are not equal to given value.
+  """
+  sender_not: String
+  """
+  All values that are contained in given list.
+  """
+  sender_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  sender_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  sender_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  sender_lte: String
+  """
+  All values greater than the given value.
+  """
+  sender_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  sender_gte: String
+  """
+  All values containing the given string.
+  """
+  sender_contains: String
+  """
+  All values not containing the given string.
+  """
+  sender_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  sender_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  sender_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  sender_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  sender_not_ends_with: String
   read: Boolean
   """
   All values that are not equal to given value.
@@ -1651,6 +1722,9 @@ input MessageWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
+  files_every: FileWhereInput
+  files_some: FileWhereInput
+  files_none: FileWhereInput
   conversation: ConversationWhereInput
 }
 
@@ -1663,6 +1737,7 @@ type Mutation {
   createUser(data: UserCreateInput!): User!
   createConversation(data: ConversationCreateInput!): Conversation!
   createMessage(data: MessageCreateInput!): Message!
+  createPendingMessage(data: PendingMessageCreateInput!): PendingMessage!
   createNotificationGroup(data: NotificationGroupCreateInput!): NotificationGroup!
   createNotification(data: NotificationCreateInput!): Notification!
   createContact(data: ContactCreateInput!): Contact!
@@ -1670,24 +1745,28 @@ type Mutation {
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateConversation(data: ConversationUpdateInput!, where: ConversationWhereUniqueInput!): Conversation
   updateMessage(data: MessageUpdateInput!, where: MessageWhereUniqueInput!): Message
+  updatePendingMessage(data: PendingMessageUpdateInput!, where: PendingMessageWhereUniqueInput!): PendingMessage
   updateNotificationGroup(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereUniqueInput!): NotificationGroup
   updateNotification(data: NotificationUpdateInput!, where: NotificationWhereUniqueInput!): Notification
   deleteFile(where: FileWhereUniqueInput!): File
   deleteUser(where: UserWhereUniqueInput!): User
   deleteConversation(where: ConversationWhereUniqueInput!): Conversation
   deleteMessage(where: MessageWhereUniqueInput!): Message
+  deletePendingMessage(where: PendingMessageWhereUniqueInput!): PendingMessage
   deleteNotificationGroup(where: NotificationGroupWhereUniqueInput!): NotificationGroup
   deleteNotification(where: NotificationWhereUniqueInput!): Notification
   upsertFile(where: FileWhereUniqueInput!, create: FileCreateInput!, update: FileUpdateInput!): File!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertConversation(where: ConversationWhereUniqueInput!, create: ConversationCreateInput!, update: ConversationUpdateInput!): Conversation!
   upsertMessage(where: MessageWhereUniqueInput!, create: MessageCreateInput!, update: MessageUpdateInput!): Message!
+  upsertPendingMessage(where: PendingMessageWhereUniqueInput!, create: PendingMessageCreateInput!, update: PendingMessageUpdateInput!): PendingMessage!
   upsertNotificationGroup(where: NotificationGroupWhereUniqueInput!, create: NotificationGroupCreateInput!, update: NotificationGroupUpdateInput!): NotificationGroup!
   upsertNotification(where: NotificationWhereUniqueInput!, create: NotificationCreateInput!, update: NotificationUpdateInput!): Notification!
   updateManyFiles(data: FileUpdateInput!, where: FileWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyConversations(data: ConversationUpdateInput!, where: ConversationWhereInput!): BatchPayload!
   updateManyMessages(data: MessageUpdateInput!, where: MessageWhereInput!): BatchPayload!
+  updateManyPendingMessages(data: PendingMessageUpdateInput!, where: PendingMessageWhereInput!): BatchPayload!
   updateManyNotificationGroups(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereInput!): BatchPayload!
   updateManyNotifications(data: NotificationUpdateInput!, where: NotificationWhereInput!): BatchPayload!
   updateManyContacts(data: ContactUpdateInput!, where: ContactWhereInput!): BatchPayload!
@@ -1695,6 +1774,7 @@ type Mutation {
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyConversations(where: ConversationWhereInput!): BatchPayload!
   deleteManyMessages(where: MessageWhereInput!): BatchPayload!
+  deleteManyPendingMessages(where: PendingMessageWhereInput!): BatchPayload!
   deleteManyNotificationGroups(where: NotificationGroupWhereInput!): BatchPayload!
   deleteManyNotifications(where: NotificationWhereInput!): BatchPayload!
   deleteManyContacts(where: ContactWhereInput!): BatchPayload!
@@ -1870,9 +1950,9 @@ input NotificationGroupUpdateInput {
 input NotificationGroupUpdateOneWithoutNotificationsInput {
   create: NotificationGroupCreateWithoutNotificationsInput
   connect: NotificationGroupWhereUniqueInput
-  disconnect: NotificationGroupWhereUniqueInput
-  delete: NotificationGroupWhereUniqueInput
-  update: NotificationGroupUpdateWithoutNotificationsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: NotificationGroupUpdateWithoutNotificationsDataInput
   upsert: NotificationGroupUpsertWithoutNotificationsInput
 }
 
@@ -1880,13 +1960,7 @@ input NotificationGroupUpdateWithoutNotificationsDataInput {
   user: UserUpdateOneInput
 }
 
-input NotificationGroupUpdateWithoutNotificationsInput {
-  where: NotificationGroupWhereUniqueInput!
-  data: NotificationGroupUpdateWithoutNotificationsDataInput!
-}
-
 input NotificationGroupUpsertWithoutNotificationsInput {
-  where: NotificationGroupWhereUniqueInput!
   update: NotificationGroupUpdateWithoutNotificationsDataInput!
   create: NotificationGroupCreateWithoutNotificationsInput!
 }
@@ -2098,8 +2172,8 @@ input NotificationUpdateManyWithoutNotificationGroupInput {
   connect: [NotificationWhereUniqueInput!]
   disconnect: [NotificationWhereUniqueInput!]
   delete: [NotificationWhereUniqueInput!]
-  update: [NotificationUpdateWithoutNotificationGroupInput!]
-  upsert: [NotificationUpsertWithoutNotificationGroupInput!]
+  update: [NotificationUpdateWithWhereUniqueWithoutNotificationGroupInput!]
+  upsert: [NotificationUpsertWithWhereUniqueWithoutNotificationGroupInput!]
 }
 
 input NotificationUpdateWithoutNotificationGroupDataInput {
@@ -2109,12 +2183,12 @@ input NotificationUpdateWithoutNotificationGroupDataInput {
   actions: NotificationUpdateactionsInput
 }
 
-input NotificationUpdateWithoutNotificationGroupInput {
+input NotificationUpdateWithWhereUniqueWithoutNotificationGroupInput {
   where: NotificationWhereUniqueInput!
   data: NotificationUpdateWithoutNotificationGroupDataInput!
 }
 
-input NotificationUpsertWithoutNotificationGroupInput {
+input NotificationUpsertWithWhereUniqueWithoutNotificationGroupInput {
   where: NotificationWhereUniqueInput!
   update: NotificationUpdateWithoutNotificationGroupDataInput!
   create: NotificationCreateWithoutNotificationGroupInput!
@@ -2356,11 +2430,429 @@ type PageInfo {
   endCursor: String
 }
 
+"""
+A connection to a list of items.
+"""
+type PendingMessageConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [PendingMessageEdge]!
+  aggregate: AggregatePendingMessage!
+}
+
+input PendingMessageCreateInput {
+  address: String!
+  body: String!
+  error: Boolean
+  files: FileCreateManyWithoutPendingMessageInput
+  user: UserCreateOneWithoutPendingMessagesInput
+}
+
+input PendingMessageCreateManyWithoutUserInput {
+  create: [PendingMessageCreateWithoutUserInput!]
+  connect: [PendingMessageWhereUniqueInput!]
+}
+
+input PendingMessageCreateOneWithoutFilesInput {
+  create: PendingMessageCreateWithoutFilesInput
+  connect: PendingMessageWhereUniqueInput
+}
+
+input PendingMessageCreateWithoutFilesInput {
+  address: String!
+  body: String!
+  error: Boolean
+  user: UserCreateOneWithoutPendingMessagesInput
+}
+
+input PendingMessageCreateWithoutUserInput {
+  address: String!
+  body: String!
+  error: Boolean
+  files: FileCreateManyWithoutPendingMessageInput
+}
+
+"""
+An edge in a connection.
+"""
+type PendingMessageEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: PendingMessage!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum PendingMessageOrderByInput {
+  id_ASC
+  id_DESC
+  address_ASC
+  address_DESC
+  body_ASC
+  body_DESC
+  error_ASC
+  error_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type PendingMessagePreviousValues {
+  id: ID!
+  address: String!
+  body: String!
+  error: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PendingMessageSubscriptionPayload {
+  mutation: MutationType!
+  node: PendingMessage
+  updatedFields: [String!]
+  previousValues: PendingMessagePreviousValues
+}
+
+input PendingMessageSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [PendingMessageSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [PendingMessageSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: PendingMessageWhereInput
+}
+
+input PendingMessageUpdateInput {
+  address: String
+  body: String
+  error: Boolean
+  files: FileUpdateManyWithoutPendingMessageInput
+  user: UserUpdateOneWithoutPendingMessagesInput
+}
+
+input PendingMessageUpdateManyWithoutUserInput {
+  create: [PendingMessageCreateWithoutUserInput!]
+  connect: [PendingMessageWhereUniqueInput!]
+  disconnect: [PendingMessageWhereUniqueInput!]
+  delete: [PendingMessageWhereUniqueInput!]
+  update: [PendingMessageUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [PendingMessageUpsertWithWhereUniqueWithoutUserInput!]
+}
+
+input PendingMessageUpdateOneWithoutFilesInput {
+  create: PendingMessageCreateWithoutFilesInput
+  connect: PendingMessageWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: PendingMessageUpdateWithoutFilesDataInput
+  upsert: PendingMessageUpsertWithoutFilesInput
+}
+
+input PendingMessageUpdateWithoutFilesDataInput {
+  address: String
+  body: String
+  error: Boolean
+  user: UserUpdateOneWithoutPendingMessagesInput
+}
+
+input PendingMessageUpdateWithoutUserDataInput {
+  address: String
+  body: String
+  error: Boolean
+  files: FileUpdateManyWithoutPendingMessageInput
+}
+
+input PendingMessageUpdateWithWhereUniqueWithoutUserInput {
+  where: PendingMessageWhereUniqueInput!
+  data: PendingMessageUpdateWithoutUserDataInput!
+}
+
+input PendingMessageUpsertWithoutFilesInput {
+  update: PendingMessageUpdateWithoutFilesDataInput!
+  create: PendingMessageCreateWithoutFilesInput!
+}
+
+input PendingMessageUpsertWithWhereUniqueWithoutUserInput {
+  where: PendingMessageWhereUniqueInput!
+  update: PendingMessageUpdateWithoutUserDataInput!
+  create: PendingMessageCreateWithoutUserInput!
+}
+
+input PendingMessageWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [PendingMessageWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [PendingMessageWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  address: String
+  """
+  All values that are not equal to given value.
+  """
+  address_not: String
+  """
+  All values that are contained in given list.
+  """
+  address_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  address_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  address_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  address_lte: String
+  """
+  All values greater than the given value.
+  """
+  address_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  address_gte: String
+  """
+  All values containing the given string.
+  """
+  address_contains: String
+  """
+  All values not containing the given string.
+  """
+  address_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  address_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  address_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  address_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  address_not_ends_with: String
+  body: String
+  """
+  All values that are not equal to given value.
+  """
+  body_not: String
+  """
+  All values that are contained in given list.
+  """
+  body_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  body_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  body_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  body_lte: String
+  """
+  All values greater than the given value.
+  """
+  body_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  body_gte: String
+  """
+  All values containing the given string.
+  """
+  body_contains: String
+  """
+  All values not containing the given string.
+  """
+  body_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  body_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  body_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  body_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  body_not_ends_with: String
+  error: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  error_not: Boolean
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  files_every: FileWhereInput
+  files_some: FileWhereInput
+  files_none: FileWhereInput
+  user: UserWhereInput
+}
+
+input PendingMessageWhereUniqueInput {
+  id: ID
+}
+
 type Query {
   files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation]!
   messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message]!
+  pendingMessages(where: PendingMessageWhereInput, orderBy: PendingMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [PendingMessage]!
   notificationGroups(where: NotificationGroupWhereInput, orderBy: NotificationGroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NotificationGroup]!
   notifications(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Notification]!
   contacts(where: ContactWhereInput, orderBy: ContactOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Contact]!
@@ -2368,12 +2860,14 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   conversation(where: ConversationWhereUniqueInput!): Conversation
   message(where: MessageWhereUniqueInput!): Message
+  pendingMessage(where: PendingMessageWhereUniqueInput!): PendingMessage
   notificationGroup(where: NotificationGroupWhereUniqueInput!): NotificationGroup
   notification(where: NotificationWhereUniqueInput!): Notification
   filesConnection(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FileConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   conversationsConnection(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConversationConnection!
   messagesConnection(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MessageConnection!
+  pendingMessagesConnection(where: PendingMessageWhereInput, orderBy: PendingMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PendingMessageConnection!
   notificationGroupsConnection(where: NotificationGroupWhereInput, orderBy: NotificationGroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NotificationGroupConnection!
   notificationsConnection(where: NotificationWhereInput, orderBy: NotificationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NotificationConnection!
   contactsConnection(where: ContactWhereInput, orderBy: ContactOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ContactConnection!
@@ -2391,6 +2885,7 @@ type Subscription {
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   conversation(where: ConversationSubscriptionWhereInput): ConversationSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
+  pendingMessage(where: PendingMessageSubscriptionWhereInput): PendingMessageSubscriptionPayload
   notificationGroup(where: NotificationGroupSubscriptionWhereInput): NotificationGroupSubscriptionPayload
   notification(where: NotificationSubscriptionWhereInput): NotificationSubscriptionPayload
   contact(where: ContactSubscriptionWhereInput): ContactSubscriptionPayload
@@ -2417,6 +2912,7 @@ input UserCreateInput {
   uid: String!
   phone: String!
   conversations: ConversationCreateManyWithoutUserInput
+  pendingMessages: PendingMessageCreateManyWithoutUserInput
 }
 
 input UserCreateOneInput {
@@ -2429,11 +2925,25 @@ input UserCreateOneWithoutConversationsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateOneWithoutPendingMessagesInput {
+  create: UserCreateWithoutPendingMessagesInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreateWithoutConversationsInput {
   name: String!
   email: String!
   uid: String!
   phone: String!
+  pendingMessages: PendingMessageCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutPendingMessagesInput {
+  name: String!
+  email: String!
+  uid: String!
+  phone: String!
+  conversations: ConversationCreateManyWithoutUserInput
 }
 
 """
@@ -2518,6 +3028,7 @@ input UserUpdateDataInput {
   uid: String
   phone: String
   conversations: ConversationUpdateManyWithoutUserInput
+  pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
 
 input UserUpdateInput {
@@ -2526,29 +3037,34 @@ input UserUpdateInput {
   uid: String
   phone: String
   conversations: ConversationUpdateManyWithoutUserInput
-}
-
-input UserUpdateNestedInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateDataInput!
+  pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
 
 input UserUpdateOneInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
-  disconnect: UserWhereUniqueInput
-  delete: UserWhereUniqueInput
-  update: UserUpdateNestedInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateDataInput
   upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutConversationsInput {
   create: UserCreateWithoutConversationsInput
   connect: UserWhereUniqueInput
-  disconnect: UserWhereUniqueInput
-  delete: UserWhereUniqueInput
-  update: UserUpdateWithoutConversationsInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutConversationsDataInput
   upsert: UserUpsertWithoutConversationsInput
+}
+
+input UserUpdateOneWithoutPendingMessagesInput {
+  create: UserCreateWithoutPendingMessagesInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutPendingMessagesDataInput
+  upsert: UserUpsertWithoutPendingMessagesInput
 }
 
 input UserUpdateWithoutConversationsDataInput {
@@ -2556,23 +3072,30 @@ input UserUpdateWithoutConversationsDataInput {
   email: String
   uid: String
   phone: String
+  pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
 
-input UserUpdateWithoutConversationsInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateWithoutConversationsDataInput!
+input UserUpdateWithoutPendingMessagesDataInput {
+  name: String
+  email: String
+  uid: String
+  phone: String
+  conversations: ConversationUpdateManyWithoutUserInput
 }
 
 input UserUpsertNestedInput {
-  where: UserWhereUniqueInput!
   update: UserUpdateDataInput!
   create: UserCreateInput!
 }
 
 input UserUpsertWithoutConversationsInput {
-  where: UserWhereUniqueInput!
   update: UserUpdateWithoutConversationsDataInput!
   create: UserCreateWithoutConversationsInput!
+}
+
+input UserUpsertWithoutPendingMessagesInput {
+  update: UserUpdateWithoutPendingMessagesDataInput!
+  create: UserCreateWithoutPendingMessagesInput!
 }
 
 input UserWhereInput {
@@ -2910,6 +3433,9 @@ input UserWhereInput {
   conversations_every: ConversationWhereInput
   conversations_some: ConversationWhereInput
   conversations_none: ConversationWhereInput
+  pendingMessages_every: PendingMessageWhereInput
+  pendingMessages_some: PendingMessageWhereInput
+  pendingMessages_none: PendingMessageWhereInput
 }
 
 input UserWhereUniqueInput {

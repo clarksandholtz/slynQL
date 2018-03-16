@@ -8,8 +8,7 @@ const messages = {
     let conversation = await ctx.db.query.conversations( {where: {threadId: args.threadId, user: {id: userId}}})
     // if not create a new conversation for the user
     if(conversation.length == 0) { 
-      let phoneNums = args.address.split(" ")
-      phoneNums.push(args.creator)
+      let phoneNums = args.address.trim().split(" ")
       let participants = phoneNums.map((num)=>{ return { phone: num } })
       conversation = await ctx.db.mutation.createConversation( {
         data: {
@@ -29,12 +28,17 @@ const messages = {
     const message = await ctx.db.mutation.createMessage( {
       data: {
         address: args.address,
-        creator: args.creator,
+        androidMsgId: args.androidMsgId,
+        userSent: args.userSent,
+        sender: args.sender,
         body: args.body,
         read: args.read,
         error: args.error,
         date: args.date,
         threadId: args.threadId,
+        files: {
+          create: args.files
+        },
         conversation: {
           connect: {
             id: conversation.id
@@ -42,25 +46,39 @@ const messages = {
         }
       }
     })
+    //Check to see if there is a pending message and delete it if there is
+    const pendingMessages = await ctx.db.query.pendingMessages({
+      where:{
+        address: message.address,
+        body: message.body,
+        user: {id: userId}
+      }
+    })
+    if(pendingMessages && pendingMessages.length > 0){ // If there are duplicate messages with same body and address this will delete one as a time as they are sent
+      await ctx.db.mutation.deletePendingMessage({ where:{ id: pendingMessages[0].id } })
+    }
     return message
   },
 
   async createMessages(parent, args, ctx, info){
     const userId = getUserId(ctx)
-    const promises = args.messages.map((message) => {
-      console.log(JSON.stringify(message))
-      return messages.createMessage(parent, message, ctx, info)
-    })
-    return await Promise.all(promises).then(() => {
-      return {
-        success: true,
-        status: `${args.messages.length} messages uploaded`
-      }
-    })
-    .catch((err)=>{
-      return {
-        success: true,
-        status: `Error: ${err}. Talk to your server guru.`
+    for(let x = 0; x < args.messages.length; x++){
+      await messages.createMessage(parent, args.messages[x], ctx, info)
+    }
+    console.log("LENGTH: " + args.messages.length)
+    return {
+      success: true,
+      status: `${args.messages.length} messages uploaded`
+    }
+  },
+  
+  async sendMessage(parent, args, ctx, info){
+    const userId = getUserId(ctx)
+    await ctx.db.mutation.createPendingMessage({
+      data: {
+        address: args.address,
+        body: args.body,
+        files: args.files
       }
     })
   },
@@ -102,4 +120,4 @@ const messages = {
 
 }
 
-module.exports = { messages }
+module.exports = { messages} 

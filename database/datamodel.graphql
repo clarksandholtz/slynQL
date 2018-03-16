@@ -1,12 +1,12 @@
 type File @model {
-  contentType: String!
-  createdAt: DateTime!
   id: ID! @unique
-  name: String!
-  secret: String! @unique
-  size: Int!
+  message: Message @relation(name: "FileInMessage")
+  pendingMessage: PendingMessage @relation(name: "FileInPendingMessage")
+  contentType: String!
+  content: String! @unique
+  uploaded: Boolean @default(value: "false")
   updatedAt: DateTime!
-  url: String! @unique
+  createdAt: DateTime!
 }
 
 type User @model {
@@ -16,6 +16,7 @@ type User @model {
   uid: String!
   phone: String! @unique
   conversations: [Conversation!]! @relation(name: "UsersConversation")
+  pendingMessages: [PendingMessage!]! @relation(name: "UsersPendingMessages")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -32,14 +33,28 @@ type Conversation @model {
 
 type Message @model {
   id: ID! @unique
-  creator: String!
+  userSent: Boolean!
+  androidMsgId: String!
   address: String!
+  sender: String!
   read: Boolean!
   body: String!
   threadId: Int!
   error: Boolean!
   date: DateTime!
+  files: [File!]! @relation(name: "FileInMessage")
   conversation: Conversation @relation(name: "MessagesInConversation")
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PendingMessage @model {
+  id: ID! @unique
+  address: String!
+  body: String!
+  error: Boolean @default(value: "false")
+  files: [File!]! @relation(name: "FileInPendingMessage")
+  user: User @relation(name: "UsersPendingMessages")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
