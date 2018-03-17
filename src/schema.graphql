@@ -14,11 +14,16 @@ type Mutation {
   updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
   createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
 
-  markThreadAsRead(threadId: Int!): BatchPayload!
+  markThreadAsRead(threadId: Int!): StatusPayload!
 
   deleteMessage(id: ID!): Message!
   deleteConversation(id: ID!): Conversation!
   deleteAllMessages: BatchPayload!
+}
+
+type Subscription {
+  pendingMessages : PendingMessageSubscriptionPayload
+  newMessage : MessageSubscriptionPayload
 }
 
 type AuthPayload {

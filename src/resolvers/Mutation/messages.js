@@ -1,5 +1,6 @@
 const { getUserId } = require('../../utils')
 
+
 const messages = {
   async createMessage(parent, args, ctx, info) {
     // Authorize the user and query it to add the message to
@@ -74,13 +75,17 @@ const messages = {
   
   async sendMessage(parent, args, ctx, info){
     const userId = getUserId(ctx)
-    await ctx.db.mutation.createPendingMessage({
+    const pendingMsg =  await ctx.db.mutation.createPendingMessage({
       data: {
         address: args.address,
         body: args.body,
-        files: args.files
+        files: args.files,
+        user: {
+          connect: {id: userId}
+        }
       }
     })
+    return pendingMsg
   },
 
   async updateMessage(parent, args, ctx, info) {
