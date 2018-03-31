@@ -53,7 +53,7 @@ type PendingMessage @model {
   address: String!
   body: String!
   error: Boolean @default(value: "false")
-  files: [File!]! @relation(name: "FileInPendingMessage")
+  file: File @relation(name: "FileInPendingMessage")
   user: User @relation(name: "UsersPendingMessages")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -80,5 +80,6 @@ type Notification @model {
 
 type Contact @model {
   phone: String!
+  name: String!
   conversation: Conversation @relation(name: "ContactInConversation")
 }

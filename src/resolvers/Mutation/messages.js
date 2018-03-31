@@ -1,4 +1,5 @@
 const { getUserId } = require('../../utils')
+const { pubsub } = require('../Subscription')
 
 
 const messages = {
@@ -75,16 +76,28 @@ const messages = {
   
   async sendMessage(parent, args, ctx, info){
     const userId = getUserId(ctx)
-    const pendingMsg =  await ctx.db.mutation.createPendingMessage({
+    let pendingMsg =  await ctx.db.mutation.createPendingMessage({
       data: {
         address: args.address,
         body: args.body,
-        files: args.files,
+        file: {
+          create: args.file
+        },
         user: {
           connect: {id: userId}
         }
       }
     })
+   
+    if(args.file){
+      const file = await ctx.db.query.file({where: {content: args.file.content}})
+      pendingMsg = {
+        ...pendingMsg,
+        file: file
+      }
+    }
+    pubsub.publish(userId+"toSend", {pendingMessages: pendingMsg})
+    console.log("Pending Message sent to " + userId + " " +  JSON.stringify(pendingMsg))
     return pendingMsg
   },
 

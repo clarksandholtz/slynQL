@@ -4,6 +4,7 @@ const resolvers = require('./resolvers')
 const fs = require('fs')
 const bodyParser = require('body-parser');
 const { getUserIdFromAuthorization } = require('./utils')
+const { pubsub } = require('./resolvers/Subscription')
 
 const db = new Prisma({
   typeDefs: `src/generated/prisma.graphql`,
@@ -16,13 +17,17 @@ const server = new GraphQLServer({
   typeDefs: 'src/schema.graphql',
   resolvers,
   context: req => ({
-    ...req,
+    ...req, 
     db
   }),
 })
 
 server.express.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 server.express.use(bodyParser.json({ type: 'application/json', limit: '50mb' }));
+// server.express.use(function(req, res, next) {
+//   //console.log(req)
+//   next()
+// })
 
 server.express.post('/upload/image',  (req, res, next)=>{
   // Upload as type base64 and save to the Images directory under a sepcial name
@@ -45,7 +50,8 @@ server.express.post('/upload/image',  (req, res, next)=>{
 
 server.express.get('/download/image', (req, res, next)=>{
   // This endpont will delete the images after downloading them off of the server
-  getUserIdFromAuthorization(req.get("Authorization"))
+  //getUserIdFromAuthorization(req.get("Authorization"))
+  console.log(req)
   var file = __dirname + '/../Images/' + req.query.name
   res.download(file, (err)=>{ 
     if(err){ // display error if there was an error deleting the file
@@ -53,15 +59,45 @@ server.express.get('/download/image', (req, res, next)=>{
     } else { // if there wasn't an error and the file downloaded then delete it
       fs.unlink(file, function (err) {
         if (err) {
-            console.error(err.toString())
+           console.error(err.toString())
         } else {
-            console.warn(file + ' deleted')
+          console.warn(file + ' deleted')
         }
       });
     }
   })
-  res.sendStatus(200)
 })
 
 server.start(() => console.log('Server is running on http://localhost:4000'))
+
+// Separate Websocket Port
+
+const { createServer } = require('http')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
+const { execute, subscribe } = require('graphql')
+const { schema } = require ('./schema')
+
+const WS_PORT = 5000;
+
+// Create WebSocket listener server
+const websocketServer = createServer((request, response) => {
+  response.writeHead(404);
+  response.end();
+});
+// Bind it to port and start listening
+websocketServer.listen(WS_PORT, () => console.log(
+  `Websocket Server is now running on http://localhost:${WS_PORT}`
+));
+
+const subscriptionServer = SubscriptionServer.create(
+  {
+    schema,
+    execute,
+    subscribe,
+  },
+  {
+    server: websocketServer,
+    path: '/graphql',
+  },
+);
 

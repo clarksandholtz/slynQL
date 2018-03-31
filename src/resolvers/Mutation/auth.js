@@ -14,13 +14,13 @@ const auth = {
     }
   },
 
-  async login(parent, {email, uid}, ctx, info) {
-    const user = await ctx.db.query.user({ where: { email } })
+  async login(parent, args, ctx, info) {
+    const user = await ctx.db.query.user({ where: { email: args.email } })
     if (!user) {
       throw new Error(`No such user found for email: ${email}`)
     }
 
-    const valid = await bcrypt.compare(uid, user.uid)
+    const valid = await bcrypt.compare(args.uid, user.uid)
     if (!valid) {
       throw new Error('Invalid password')
     }

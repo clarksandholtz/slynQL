@@ -67,7 +67,7 @@ type PendingMessage implements Node {
   address: String!
   body: String!
   error: Boolean
-  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
+  file(where: FileWhereInput): File
   user(where: UserWhereInput): User
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -131,6 +131,7 @@ type BatchPayload {
 
 type Contact {
   phone: String!
+  name: String!
   conversation(where: ConversationWhereInput): Conversation
 }
 
@@ -151,6 +152,7 @@ type ContactConnection {
 
 input ContactCreateInput {
   phone: String!
+  name: String!
   conversation: ConversationCreateOneWithoutParticipantsInput
 }
 
@@ -160,6 +162,7 @@ input ContactCreateManyWithoutConversationInput {
 
 input ContactCreateWithoutConversationInput {
   phone: String!
+  name: String!
 }
 
 """
@@ -179,6 +182,8 @@ type ContactEdge {
 enum ContactOrderByInput {
   phone_ASC
   phone_DESC
+  name_ASC
+  name_DESC
   id_ASC
   id_DESC
   updatedAt_ASC
@@ -189,6 +194,7 @@ enum ContactOrderByInput {
 
 type ContactPreviousValues {
   phone: String!
+  name: String!
 }
 
 type ContactSubscriptionPayload {
@@ -228,6 +234,7 @@ input ContactSubscriptionWhereInput {
 
 input ContactUpdateInput {
   phone: String
+  name: String
   conversation: ConversationUpdateOneWithoutParticipantsInput
 }
 
@@ -297,6 +304,59 @@ input ContactWhereInput {
   All values not ending with the given string.
   """
   phone_not_ends_with: String
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
   conversation: ConversationWhereInput
 }
 
@@ -679,7 +739,7 @@ input FileCreateInput {
   content: String!
   uploaded: Boolean
   message: MessageCreateOneWithoutFilesInput
-  pendingMessage: PendingMessageCreateOneWithoutFilesInput
+  pendingMessage: PendingMessageCreateOneWithoutFileInput
 }
 
 input FileCreateManyWithoutMessageInput {
@@ -687,16 +747,16 @@ input FileCreateManyWithoutMessageInput {
   connect: [FileWhereUniqueInput!]
 }
 
-input FileCreateManyWithoutPendingMessageInput {
-  create: [FileCreateWithoutPendingMessageInput!]
-  connect: [FileWhereUniqueInput!]
+input FileCreateOneWithoutPendingMessageInput {
+  create: FileCreateWithoutPendingMessageInput
+  connect: FileWhereUniqueInput
 }
 
 input FileCreateWithoutMessageInput {
   contentType: String!
   content: String!
   uploaded: Boolean
-  pendingMessage: PendingMessageCreateOneWithoutFilesInput
+  pendingMessage: PendingMessageCreateOneWithoutFileInput
 }
 
 input FileCreateWithoutPendingMessageInput {
@@ -784,7 +844,7 @@ input FileUpdateInput {
   content: String
   uploaded: Boolean
   message: MessageUpdateOneWithoutFilesInput
-  pendingMessage: PendingMessageUpdateOneWithoutFilesInput
+  pendingMessage: PendingMessageUpdateOneWithoutFileInput
 }
 
 input FileUpdateManyWithoutMessageInput {
@@ -796,20 +856,20 @@ input FileUpdateManyWithoutMessageInput {
   upsert: [FileUpsertWithWhereUniqueWithoutMessageInput!]
 }
 
-input FileUpdateManyWithoutPendingMessageInput {
-  create: [FileCreateWithoutPendingMessageInput!]
-  connect: [FileWhereUniqueInput!]
-  disconnect: [FileWhereUniqueInput!]
-  delete: [FileWhereUniqueInput!]
-  update: [FileUpdateWithWhereUniqueWithoutPendingMessageInput!]
-  upsert: [FileUpsertWithWhereUniqueWithoutPendingMessageInput!]
+input FileUpdateOneWithoutPendingMessageInput {
+  create: FileCreateWithoutPendingMessageInput
+  connect: FileWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: FileUpdateWithoutPendingMessageDataInput
+  upsert: FileUpsertWithoutPendingMessageInput
 }
 
 input FileUpdateWithoutMessageDataInput {
   contentType: String
   content: String
   uploaded: Boolean
-  pendingMessage: PendingMessageUpdateOneWithoutFilesInput
+  pendingMessage: PendingMessageUpdateOneWithoutFileInput
 }
 
 input FileUpdateWithoutPendingMessageDataInput {
@@ -824,21 +884,15 @@ input FileUpdateWithWhereUniqueWithoutMessageInput {
   data: FileUpdateWithoutMessageDataInput!
 }
 
-input FileUpdateWithWhereUniqueWithoutPendingMessageInput {
-  where: FileWhereUniqueInput!
-  data: FileUpdateWithoutPendingMessageDataInput!
+input FileUpsertWithoutPendingMessageInput {
+  update: FileUpdateWithoutPendingMessageDataInput!
+  create: FileCreateWithoutPendingMessageInput!
 }
 
 input FileUpsertWithWhereUniqueWithoutMessageInput {
   where: FileWhereUniqueInput!
   update: FileUpdateWithoutMessageDataInput!
   create: FileCreateWithoutMessageInput!
-}
-
-input FileUpsertWithWhereUniqueWithoutPendingMessageInput {
-  where: FileWhereUniqueInput!
-  update: FileUpdateWithoutPendingMessageDataInput!
-  create: FileCreateWithoutPendingMessageInput!
 }
 
 input FileWhereInput {
@@ -2449,7 +2503,7 @@ input PendingMessageCreateInput {
   address: String!
   body: String!
   error: Boolean
-  files: FileCreateManyWithoutPendingMessageInput
+  file: FileCreateOneWithoutPendingMessageInput
   user: UserCreateOneWithoutPendingMessagesInput
 }
 
@@ -2458,12 +2512,12 @@ input PendingMessageCreateManyWithoutUserInput {
   connect: [PendingMessageWhereUniqueInput!]
 }
 
-input PendingMessageCreateOneWithoutFilesInput {
-  create: PendingMessageCreateWithoutFilesInput
+input PendingMessageCreateOneWithoutFileInput {
+  create: PendingMessageCreateWithoutFileInput
   connect: PendingMessageWhereUniqueInput
 }
 
-input PendingMessageCreateWithoutFilesInput {
+input PendingMessageCreateWithoutFileInput {
   address: String!
   body: String!
   error: Boolean
@@ -2474,7 +2528,7 @@ input PendingMessageCreateWithoutUserInput {
   address: String!
   body: String!
   error: Boolean
-  files: FileCreateManyWithoutPendingMessageInput
+  file: FileCreateOneWithoutPendingMessageInput
 }
 
 """
@@ -2554,7 +2608,7 @@ input PendingMessageUpdateInput {
   address: String
   body: String
   error: Boolean
-  files: FileUpdateManyWithoutPendingMessageInput
+  file: FileUpdateOneWithoutPendingMessageInput
   user: UserUpdateOneWithoutPendingMessagesInput
 }
 
@@ -2567,16 +2621,16 @@ input PendingMessageUpdateManyWithoutUserInput {
   upsert: [PendingMessageUpsertWithWhereUniqueWithoutUserInput!]
 }
 
-input PendingMessageUpdateOneWithoutFilesInput {
-  create: PendingMessageCreateWithoutFilesInput
+input PendingMessageUpdateOneWithoutFileInput {
+  create: PendingMessageCreateWithoutFileInput
   connect: PendingMessageWhereUniqueInput
   disconnect: Boolean
   delete: Boolean
-  update: PendingMessageUpdateWithoutFilesDataInput
-  upsert: PendingMessageUpsertWithoutFilesInput
+  update: PendingMessageUpdateWithoutFileDataInput
+  upsert: PendingMessageUpsertWithoutFileInput
 }
 
-input PendingMessageUpdateWithoutFilesDataInput {
+input PendingMessageUpdateWithoutFileDataInput {
   address: String
   body: String
   error: Boolean
@@ -2587,7 +2641,7 @@ input PendingMessageUpdateWithoutUserDataInput {
   address: String
   body: String
   error: Boolean
-  files: FileUpdateManyWithoutPendingMessageInput
+  file: FileUpdateOneWithoutPendingMessageInput
 }
 
 input PendingMessageUpdateWithWhereUniqueWithoutUserInput {
@@ -2595,9 +2649,9 @@ input PendingMessageUpdateWithWhereUniqueWithoutUserInput {
   data: PendingMessageUpdateWithoutUserDataInput!
 }
 
-input PendingMessageUpsertWithoutFilesInput {
-  update: PendingMessageUpdateWithoutFilesDataInput!
-  create: PendingMessageCreateWithoutFilesInput!
+input PendingMessageUpsertWithoutFileInput {
+  update: PendingMessageUpdateWithoutFileDataInput!
+  create: PendingMessageCreateWithoutFileInput!
 }
 
 input PendingMessageUpsertWithWhereUniqueWithoutUserInput {
@@ -2837,9 +2891,7 @@ input PendingMessageWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  files_every: FileWhereInput
-  files_some: FileWhereInput
-  files_none: FileWhereInput
+  file: FileWhereInput
   user: UserWhereInput
 }
 

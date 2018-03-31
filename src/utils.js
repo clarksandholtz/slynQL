@@ -8,10 +8,14 @@ function getUserId(ctx) {
 function getUserIdFromAuthorization(Authorization){
   if (Authorization) {
     const token = Authorization.replace('Bearer ', '')
-    const { userId } = jwt.verify(token, process.env.APP_SECRET)
+    const { userId } = verifyToken(token)
     return userId
   } 
   throw new AuthError()
+}
+
+function verifyToken(token){
+  return jwt.verify(token, process.env.APP_SECRET)
 }
 class AuthError extends Error {
   constructor() {
@@ -22,5 +26,6 @@ class AuthError extends Error {
 module.exports = {
   getUserId,
   getUserIdFromAuthorization,
+  verifyToken,
   AuthError
 }

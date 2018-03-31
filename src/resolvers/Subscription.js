@@ -1,24 +1,26 @@
-const { getUserIdFromAuthorization } = require('../utils')
+const { verifyToken } = require('../utils')
+const { PubSub }  = require('graphql-subscriptions')
+
+const pubsub = new PubSub()
 
 const Subscription = {
   pendingMessages: {
-    subscribe: async (args, parent, ctx, info) => {
-      const userId = getUserIdFromAuthorization(ctx.connection.context.Authorization)
-      return ctx.db.subscription.pendingMessage({
-        where:{
-          node: {
-            user: {id: userId},
-          },
-        }
-      }, info)
+    //subscribe: () => pubsub.asyncIterator("TEST")
+    subscribe: async (parent, args, ctx, info) => {
+      console.log("Subscription Started")
+      console.log("TOKEN: " + args.token)
+      const { userId } = verifyToken(args.token)
+      console.log("UserId: " + userId)
+      return pubsub.asyncIterator(userId+"toSend")
     }
   },
 
   newMessage: {
-    subscribe: async(args, parent, ctx, info) => {
+    subscribe: async(parent, args, ctx, info) => {
       const userId = getUserIdFromAuthorization(ctx.connection.context.Authorization)
       return ctx.db.subscription.message({
         where:{
+          mutation_in: ["CREATED"],
           node:{
             conversation: {
               user: {
@@ -33,4 +35,4 @@ const Subscription = {
 
 }
 
-module.exports = { Subscription }
+module.exports = { Subscription, pubsub }
