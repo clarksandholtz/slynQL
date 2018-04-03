@@ -2,6 +2,8 @@ const { verifyToken } = require('../utils')
 const { PubSub }  = require('graphql-subscriptions')
 
 const pubsub = new PubSub()
+const PENDING_MESSAGE = "pending_message"
+const NEW_MESSAGE = "new_message"
 
 const Subscription = {
   pendingMessages: {
@@ -11,28 +13,20 @@ const Subscription = {
       console.log("TOKEN: " + args.token)
       const { userId } = verifyToken(args.token)
       console.log("UserId: " + userId)
-      return pubsub.asyncIterator(userId+"toSend")
+      return pubsub.asyncIterator(userId+PENDING_MESSAGE)
     }
   },
 
   newMessage: {
-    subscribe: async(parent, args, ctx, info) => {
-      const userId = getUserIdFromAuthorization(ctx.connection.context.Authorization)
-      return ctx.db.subscription.message({
-        where:{
-          mutation_in: ["CREATED"],
-          node:{
-            conversation: {
-              user: {
-                id: userId
-              }
-            }
-          }
-        }
-      }, info)
-    }
+    subscribe: async (parent, args, ctx, info) => {
+      console.log("Subscription Started")
+      console.log("TOKEN: " + args.token)
+      const { userId } = verifyToken(args.token)
+      console.log("UserId: " + userId)
+      return pubsub.asyncIterator(userId+NEW_MESSAGE)
+    } 
   },
 
 }
 
-module.exports = { Subscription, pubsub }
+module.exports = { Subscription, pubsub, PENDING_MESSAGE, NEW_MESSAGE}

@@ -80,6 +80,6 @@ type Notification @model {
 
 type Contact @model {
   phone: String!
-  name: String!
+  name: String
   conversation: Conversation @relation(name: "ContactInConversation")
 }

@@ -2,6 +2,8 @@
 
 type Query {
   allConversations: [Conversation]
+  allMessagesSince(timestamp: String!) : [Message!]
+  allPendingMessagesSince(timestamp: String!) : [PendingMessage!]
   me: User
 }
 
@@ -9,7 +11,7 @@ type Mutation {
   signup(name: String!, phone: String!, email: String!, uid: String!): AuthPayload!
   login(email: String!, uid: String!): AuthPayload!
 
-  createMessage(androidMsgId: String!, sender: String!, address: String!, userSent: Boolean!, body: String!, read: Boolean!, threadId: Int!, date: String!, error: Boolean!, files: [FileCreateInput]): Message!
+  createMessage(androidMsgId: String!, sender: String!, address: String!, participants: [ContactCreateWithoutConversationInput!]!, userSent: Boolean!, body: String!, read: Boolean!, threadId: Int!, date: String!, error: Boolean!, files: [FileCreateInput]): Message!
   sendMessage(address: String!, body: String!, file: FileCreateInput): PendingMessage
   updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
   createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
@@ -40,6 +42,7 @@ input ClientMessageCreateInput {
   userSent: Boolean!
   androidMsgId: String!
   address: String!
+  participants: [ContactCreateWithoutConversationInput!]
   sender: String!
   read: Boolean!
   body: String!

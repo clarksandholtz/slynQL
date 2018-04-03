@@ -1,5 +1,5 @@
 const { getUserId } = require('../../utils')
-const { pubsub } = require('../Subscription')
+const { pubsub, PENDING_MESSAGE, NEW_MESSAGE } = require('../Subscription')
 
 
 const messages = {
@@ -10,8 +10,6 @@ const messages = {
     let conversation = await ctx.db.query.conversations( {where: {threadId: args.threadId, user: {id: userId}}})
     // if not create a new conversation for the user
     if(conversation.length == 0) { 
-      let phoneNums = args.address.trim().split(" ")
-      let participants = phoneNums.map((num)=>{ return { phone: num } })
       conversation = await ctx.db.mutation.createConversation( {
         data: {
           threadId: args.threadId, 
@@ -21,7 +19,7 @@ const messages = {
             }
           },
           participants: {
-            create: participants
+            create: args.participants
           }
         }
       }) 
@@ -56,6 +54,7 @@ const messages = {
         user: {id: userId}
       }
     })
+    pubsub.publish(userId+NEW_MESSAGE, {newMessage: message})
     if(pendingMessages && pendingMessages.length > 0){ // If there are duplicate messages with same body and address this will delete one as a time as they are sent
       await ctx.db.mutation.deletePendingMessage({ where:{ id: pendingMessages[0].id } })
     }
@@ -96,7 +95,7 @@ const messages = {
         file: file
       }
     }
-    pubsub.publish(userId+"toSend", {pendingMessages: pendingMsg})
+    pubsub.publish(userId+PENDING_MESSAGE, {pendingMessages: pendingMsg})
     console.log("Pending Message sent to " + userId + " " +  JSON.stringify(pendingMsg))
     return pendingMsg
   },

@@ -25,7 +25,6 @@ const server = new GraphQLServer({
 server.express.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 server.express.use(bodyParser.json({ type: 'application/json', limit: '50mb' }));
 // server.express.use(function(req, res, next) {
-//   //console.log(req)
 //   next()
 // })
 
@@ -50,8 +49,7 @@ server.express.post('/upload/image',  (req, res, next)=>{
 
 server.express.get('/download/image', (req, res, next)=>{
   // This endpont will delete the images after downloading them off of the server
-  //getUserIdFromAuthorization(req.get("Authorization"))
-  console.log(req)
+  getUserIdFromAuthorization(req.get("Authorization"))
   var file = __dirname + '/../Images/' + req.query.name
   res.download(file, (err)=>{ 
     if(err){ // display error if there was an error deleting the file
@@ -75,7 +73,7 @@ server.start(() => console.log('Server is running on http://localhost:4000'))
 const { createServer } = require('http')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 const { execute, subscribe } = require('graphql')
-const { schema } = require ('./schema')
+const schema = require('prisma-json-schema/dist/schema.json')
 
 const WS_PORT = 5000;
 
