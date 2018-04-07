@@ -1,5 +1,5 @@
 const { getUserId } = require('../../utils')
-const { pubsub, PENDING_MESSAGE, NEW_MESSAGE } = require('../Subscription')
+const { pubsub, PENDING_MESSAGE, NEW_MESSAGE, SYNC_COMPLETE } = require('../Subscription')
 
 
 const messages = {
@@ -63,10 +63,13 @@ const messages = {
 
   async createMessages(parent, args, ctx, info){
     const userId = getUserId(ctx)
+    await ctx.db.mutation.updateUser({data: {syncComplete: false}})
     for(let x = 0; x < args.messages.length; x++){
       await messages.createMessage(parent, args.messages[x], ctx, info)
     }
     console.log("LENGTH: " + args.messages.length)
+    await ctx.db.mutation.updateUser({data: {syncComplete: true}})
+    pubsub.publish(userId+SYNC_COMPLETE, {syncComplete: {success: true}})
     return {
       success: true,
       status: `${args.messages.length} messages uploaded`

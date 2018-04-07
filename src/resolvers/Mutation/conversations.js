@@ -1,4 +1,5 @@
 const { getUserId } = require('../../utils')
+const { pubsub, MARKED_AS_READ } = require('../Subscription')
 
 const conversations = {
   async deleteConversation(parent, args, ctx, info) {
@@ -28,6 +29,7 @@ const conversations = {
         }
       })
     }
+    pubsub.pusblish(userId+MARKED_AS_READ, {markedAsRead: {threadId: args.threadId} })
     return {
       success: true,
       status: `${messages.length} messages marked as read`

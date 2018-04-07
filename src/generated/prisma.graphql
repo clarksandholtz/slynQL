@@ -81,6 +81,7 @@ type User implements Node {
   phone: String!
   conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation!]
   pendingMessages(where: PendingMessageWhereInput, orderBy: PendingMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [PendingMessage!]
+  syncComplete: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -131,7 +132,7 @@ type BatchPayload {
 
 type Contact {
   phone: String!
-  name: String!
+  name: String
   conversation(where: ConversationWhereInput): Conversation
 }
 
@@ -152,7 +153,7 @@ type ContactConnection {
 
 input ContactCreateInput {
   phone: String!
-  name: String!
+  name: String
   conversation: ConversationCreateOneWithoutParticipantsInput
 }
 
@@ -162,7 +163,7 @@ input ContactCreateManyWithoutConversationInput {
 
 input ContactCreateWithoutConversationInput {
   phone: String!
-  name: String!
+  name: String
 }
 
 """
@@ -194,7 +195,7 @@ enum ContactOrderByInput {
 
 type ContactPreviousValues {
   phone: String!
-  name: String!
+  name: String
 }
 
 type ContactSubscriptionPayload {
@@ -2963,6 +2964,7 @@ input UserCreateInput {
   email: String!
   uid: String!
   phone: String!
+  syncComplete: Boolean
   conversations: ConversationCreateManyWithoutUserInput
   pendingMessages: PendingMessageCreateManyWithoutUserInput
 }
@@ -2987,6 +2989,7 @@ input UserCreateWithoutConversationsInput {
   email: String!
   uid: String!
   phone: String!
+  syncComplete: Boolean
   pendingMessages: PendingMessageCreateManyWithoutUserInput
 }
 
@@ -2995,6 +2998,7 @@ input UserCreateWithoutPendingMessagesInput {
   email: String!
   uid: String!
   phone: String!
+  syncComplete: Boolean
   conversations: ConversationCreateManyWithoutUserInput
 }
 
@@ -3023,6 +3027,8 @@ enum UserOrderByInput {
   uid_DESC
   phone_ASC
   phone_DESC
+  syncComplete_ASC
+  syncComplete_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -3035,6 +3041,7 @@ type UserPreviousValues {
   email: String!
   uid: String!
   phone: String!
+  syncComplete: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -3079,6 +3086,7 @@ input UserUpdateDataInput {
   email: String
   uid: String
   phone: String
+  syncComplete: Boolean
   conversations: ConversationUpdateManyWithoutUserInput
   pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
@@ -3088,6 +3096,7 @@ input UserUpdateInput {
   email: String
   uid: String
   phone: String
+  syncComplete: Boolean
   conversations: ConversationUpdateManyWithoutUserInput
   pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
@@ -3124,6 +3133,7 @@ input UserUpdateWithoutConversationsDataInput {
   email: String
   uid: String
   phone: String
+  syncComplete: Boolean
   pendingMessages: PendingMessageUpdateManyWithoutUserInput
 }
 
@@ -3132,6 +3142,7 @@ input UserUpdateWithoutPendingMessagesDataInput {
   email: String
   uid: String
   phone: String
+  syncComplete: Boolean
   conversations: ConversationUpdateManyWithoutUserInput
 }
 
@@ -3424,6 +3435,11 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   phone_not_ends_with: String
+  syncComplete: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  syncComplete_not: Boolean
   createdAt: DateTime
   """
   All values that are not equal to given value.

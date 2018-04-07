@@ -2,8 +2,8 @@
 
 type Query {
   allConversations: [Conversation]
-  allMessagesSince(timestamp: String!) : [Message!]
-  allPendingMessagesSince(timestamp: String!) : [PendingMessage!]
+  allMessagesSince(timestamp: String!): [Message!]
+  allContacts: [Contact!]
   me: User
 }
 
@@ -25,7 +25,9 @@ type Mutation {
 
 type Subscription {
   pendingMessages(token: String!) : PendingMessage!
-  newMessage : MessageSubscriptionPayload
+  syncComplete(token: String!) : StatusPayload
+  newMessage(token: String!) : Message!
+  markedAsRead(token: String!) : Conversation!
 }
 
 type AuthPayload {
@@ -35,7 +37,7 @@ type AuthPayload {
 
 type StatusPayload {
   success: Boolean!
-  status: String!
+  status: String
 }
 
 input ClientMessageCreateInput {
