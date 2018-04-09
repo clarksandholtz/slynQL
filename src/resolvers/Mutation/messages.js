@@ -63,12 +63,12 @@ const messages = {
 
   async createMessages(parent, args, ctx, info){
     const userId = getUserId(ctx)
-    await ctx.db.mutation.updateUser({data: {syncComplete: false}})
+    await ctx.db.mutation.updateUser({data: {syncComplete: false }, where: {id: userId}})
     for(let x = 0; x < args.messages.length; x++){
       await messages.createMessage(parent, args.messages[x], ctx, info)
     }
     console.log("LENGTH: " + args.messages.length)
-    await ctx.db.mutation.updateUser({data: {syncComplete: true}})
+    await ctx.db.mutation.updateUser({data: {syncComplete: true }, where: {id: userId}})
     pubsub.publish(userId+SYNC_COMPLETE, {syncComplete: {success: true}})
     return {
       success: true,

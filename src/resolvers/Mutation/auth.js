@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken')
 
 const auth = {
   async signup(parent, args, ctx, info) {
-    console.log("UDIDIDIDID: " + args.uid)
     const uid = await bcrypt.hash(args.uid, 10)
     const user = await ctx.db.mutation.createUser({
       data: { name: args.name, email: args.email, uid: uid, phone: args.phone },
@@ -15,13 +14,13 @@ const auth = {
     }
   },
 
-  async login(parent, {email, uid}, ctx, info) {
-    const user = await ctx.db.query.user({ where: { email: email } })
+  async login(parent, args, ctx, info) {
+    const user = await ctx.db.query.user({ where: { email: args.email } })
     if (!user) {
-      throw new Error(`No such user found for email: ${email}`)
+      throw new Error(`No such user found for email: ${args.email}`)
     }
 
-    const valid = await bcrypt.compare(uid, user.uid)
+    const valid = await bcrypt.compare(args.uid, user.uid)
     if (!valid) {
       throw new Error('Invalid password')
     }

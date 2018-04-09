@@ -40,7 +40,6 @@ server.express.post('/upload/image',  (req, res, next)=>{
     if(err){
       console.log(err)
     } else{
-      res.sendStatus(200)
       db.mutation.updateFile({data: {uploaded: true}, where: {content: req.body.name}})
     }
   });

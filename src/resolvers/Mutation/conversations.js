@@ -29,7 +29,7 @@ const conversations = {
         }
       })
     }
-    pubsub.pusblish(userId+MARKED_AS_READ, {markedAsRead: {threadId: args.threadId} })
+    pubsub.publish(userId+MARKED_AS_READ, {markedAsRead: {threadId: args.threadId} })
     return {
       success: true,
       status: `${messages.length} messages marked as read`
