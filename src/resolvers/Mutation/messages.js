@@ -130,12 +130,15 @@ const messages = {
 
   async deleteAllMessages(parent, args, ctx, info) {
     const userId = getUserId(ctx)
+    let sum = 0;
     const conversations = await ctx.db.query.conversations({where: {user: {id: userId}}})
     for(let x = 0; x < conversations.length; x++){
       await ctx.db.mutation.deleteManyContacts({where: {conversation: {id: conversations[x].id}}})
-      await ctx.db.mutation.deleteManyMessages({where: {conversation: {id: conversations[x].id}}})
+      const { count } = await ctx.db.mutation.deleteManyMessages({where: {conversation: {id: conversations[x].id}}})
+      sum += count
     }
-    return await ctx.db.mutation.deleteManyConversations({where: {user: {id: userId } } })
+    await ctx.db.mutation.deleteManyConversations({where: {user: {id: userId } } })
+    return { success: true, status: `Deleted ${sum} messages`}
   }, 
 
 }

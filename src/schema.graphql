@@ -20,7 +20,7 @@ type Mutation {
 
   deleteMessage(id: ID!): Message!
   deleteConversation(id: ID!): Conversation!
-  deleteAllMessages: BatchPayload!
+  deleteAllMessages: StatusPayload!
 }
 
 type Subscription {
