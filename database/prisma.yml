@@ -15,4 +15,4 @@ datamodel: datamodel.graphql
 seed:
   import: seed.graphql
 
-cluster: ${env:PRISMA_CLUSTER}
+cluster: public-razorhisser-124/prisma-us1

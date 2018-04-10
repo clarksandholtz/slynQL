@@ -33,13 +33,13 @@ server.express.post('/upload/image',  (req, res, next)=>{
   getUserIdFromAuthorization(req.get("Authorization"))
   if(!req.body.name || !req.body.content){
     res.send("Name or Content Missing")
-    res.sendStatus(400)
     return
   }
   fs.writeFile(__dirname + "/../Images/"+ req.body.name, req.body.content, {encoding: 'base64'}, function(err) {
     if(err){
       console.log(err)
     } else{
+      res.sendStatus(200)
       db.mutation.updateFile({data: {uploaded: true}, where: {content: req.body.name}})
     }
   });
