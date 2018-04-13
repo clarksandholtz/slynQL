@@ -21,6 +21,8 @@ type Mutation {
   deleteMessage(id: ID!): Message!
   deleteConversation(id: ID!): Conversation!
   deleteAllMessages: StatusPayload!
+
+  seed : StatusPayload!
 }
 
 type Subscription {

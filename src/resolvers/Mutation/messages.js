@@ -1,5 +1,6 @@
 const { getUserId } = require('../../utils')
 const { pubsub, PENDING_MESSAGE, NEW_MESSAGE, SYNC_COMPLETE } = require('../Subscription')
+var casual = require('casual')
 
 
 const messages = {
@@ -140,7 +141,43 @@ const messages = {
     await ctx.db.mutation.deleteManyConversations({where: {user: {id: userId } } })
     return { success: true, status: `Deleted ${sum} messages`}
   }, 
+  
+  async seed(parent, args, ctx, info) {
+    const userId = getUserId(ctx)
+    const num = 100;
+    let myPhone = casual.phone
+    let theirName = casual.full_name
+    let theirPhone = casual.phone
+    let randBool = Math.random() >= 0.5
+    let threadId = casual.integer(0,200)
+    for(let x = 0; x < num; x++){
+      randBool = Math.random() >= 0.5
+      await messages.createMessage(parent, generateMessage(randBool, (randBool ? myPhone : theirPhone), threadId, theirName, theirPhone), ctx, info)
 
+      if ( x == num / 2) {
+        threadId = casual.integer(0,200)
+        theirPhone = casual.phone
+        theirName = casual.name
+      }
+    }
+    return { success: true, status: `Added ${num} new messages`}
+  },
+
+}
+
+const generateMessage = (randBool, sender, threadId, theirName, theirPhone) => {
+  return {
+    userSent: randBool,
+    androidMsgId: casual.integer(0,1000),
+    address: theirPhone,
+    sender: sender,
+    read: true,
+    body: casual.sentence,
+    threadId: threadId,
+    participants: {name: theirName, phone: theirPhone},
+    error: false,
+    date: `2018-03-${casual.integer(10,28)}T14:${casual.integer(10,59)}Z`,
+  }
 }
 
 module.exports = { messages} 
