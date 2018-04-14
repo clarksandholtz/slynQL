@@ -5,6 +5,7 @@ type File @model {
   contentType: String!
   content: String! @unique
   uploaded: Boolean @default(value: "false")
+  deleted: Boolean @default(value: "false")
   updatedAt: DateTime!
   createdAt: DateTime!
 }

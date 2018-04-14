@@ -28,6 +28,16 @@ server.express.use(bodyParser.json({ type: 'application/json', limit: '50mb' }))
 //   next()
 // })
 
+// function nocache(req, res, next) {
+//   console.log("HERE in No Cache")
+//   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+//   res.header('Expires', '-1');
+//   res.header('Pragma', 'no-cache');
+//   next();
+// }
+
+// server.express.use(nocache)
+
 server.express.post('/upload/image',  (req, res, next)=>{
   // Upload as type base64 and save to the Images directory under a sepcial name
   getUserIdFromAuthorization(req.get("Authorization"))
@@ -58,6 +68,7 @@ server.express.get('/download/image', (req, res, next)=>{
         if (err) {
            console.error(err.toString())
         } else {
+          db.mutation.updateFile({data: {deleted: true}, where: {content: req.query.name}})
           console.warn(file + ' deleted')
         }
       });
@@ -65,7 +76,7 @@ server.express.get('/download/image', (req, res, next)=>{
   })
 })
 
-server.start(() => console.log('Server is running on http://localhost:4000'))
+server.start({cacheControl: false}, () => console.log('Server is running on http://localhost:4000'))
 
 // Separate Websocket Port
 

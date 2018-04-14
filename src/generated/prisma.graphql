@@ -22,6 +22,7 @@ type File implements Node {
   contentType: String!
   content: String!
   uploaded: Boolean
+  deleted: Boolean
   updatedAt: DateTime!
   createdAt: DateTime!
 }
@@ -739,6 +740,7 @@ input FileCreateInput {
   contentType: String!
   content: String!
   uploaded: Boolean
+  deleted: Boolean
   message: MessageCreateOneWithoutFilesInput
   pendingMessage: PendingMessageCreateOneWithoutFileInput
 }
@@ -757,6 +759,7 @@ input FileCreateWithoutMessageInput {
   contentType: String!
   content: String!
   uploaded: Boolean
+  deleted: Boolean
   pendingMessage: PendingMessageCreateOneWithoutFileInput
 }
 
@@ -764,6 +767,7 @@ input FileCreateWithoutPendingMessageInput {
   contentType: String!
   content: String!
   uploaded: Boolean
+  deleted: Boolean
   message: MessageCreateOneWithoutFilesInput
 }
 
@@ -790,6 +794,8 @@ enum FileOrderByInput {
   content_DESC
   uploaded_ASC
   uploaded_DESC
+  deleted_ASC
+  deleted_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -801,6 +807,7 @@ type FilePreviousValues {
   contentType: String!
   content: String!
   uploaded: Boolean
+  deleted: Boolean
   updatedAt: DateTime!
   createdAt: DateTime!
 }
@@ -844,6 +851,7 @@ input FileUpdateInput {
   contentType: String
   content: String
   uploaded: Boolean
+  deleted: Boolean
   message: MessageUpdateOneWithoutFilesInput
   pendingMessage: PendingMessageUpdateOneWithoutFileInput
 }
@@ -870,6 +878,7 @@ input FileUpdateWithoutMessageDataInput {
   contentType: String
   content: String
   uploaded: Boolean
+  deleted: Boolean
   pendingMessage: PendingMessageUpdateOneWithoutFileInput
 }
 
@@ -877,6 +886,7 @@ input FileUpdateWithoutPendingMessageDataInput {
   contentType: String
   content: String
   uploaded: Boolean
+  deleted: Boolean
   message: MessageUpdateOneWithoutFilesInput
 }
 
@@ -1069,6 +1079,11 @@ input FileWhereInput {
   All values that are not equal to given value.
   """
   uploaded_not: Boolean
+  deleted: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  deleted_not: Boolean
   updatedAt: DateTime
   """
   All values that are not equal to given value.

@@ -1,7 +1,7 @@
 const { getUserId } = require('../../utils')
 const { pubsub, PENDING_MESSAGE, NEW_MESSAGE, SYNC_COMPLETE } = require('../Subscription')
 var casual = require('casual')
-
+const fs = require('fs')
 
 const messages = {
   async createMessage(parent, args, ctx, info) {
@@ -134,7 +134,24 @@ const messages = {
     let sum = 0;
     const conversations = await ctx.db.query.conversations({where: {user: {id: userId}}})
     for(let x = 0; x < conversations.length; x++){
+      //Delete contacts
       await ctx.db.mutation.deleteManyContacts({where: {conversation: {id: conversations[x].id}}})
+      // Delete files and delete images on server if they haven't been deleted
+      const files = await ctx.db.query.files({where: {message: {conversation: {id: conversations[x].id}}}})
+      for(let y = 0; y < files.length; y++){
+        if(!files[y].deleted){
+          let file = __dirname + '/../../../Images/' + files[y].content
+          fs.unlink(file, function (err) {
+            if (err) {
+              console.error(err.toString())
+            } else {
+              console.warn(file + ' deleted')
+            }
+          })
+        }
+        await ctx.db.mutation.deleteFile({where: {id: files[y].id}})
+      }
+      //Now delete the messages
       const { count } = await ctx.db.mutation.deleteManyMessages({where: {conversation: {id: conversations[x].id}}})
       sum += count
     }
