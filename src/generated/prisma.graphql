@@ -1832,22 +1832,22 @@ type Mutation {
   upsertPendingMessage(where: PendingMessageWhereUniqueInput!, create: PendingMessageCreateInput!, update: PendingMessageUpdateInput!): PendingMessage!
   upsertNotificationGroup(where: NotificationGroupWhereUniqueInput!, create: NotificationGroupCreateInput!, update: NotificationGroupUpdateInput!): NotificationGroup!
   upsertNotification(where: NotificationWhereUniqueInput!, create: NotificationCreateInput!, update: NotificationUpdateInput!): Notification!
-  updateManyFiles(data: FileUpdateInput!, where: FileWhereInput!): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
-  updateManyConversations(data: ConversationUpdateInput!, where: ConversationWhereInput!): BatchPayload!
-  updateManyMessages(data: MessageUpdateInput!, where: MessageWhereInput!): BatchPayload!
-  updateManyPendingMessages(data: PendingMessageUpdateInput!, where: PendingMessageWhereInput!): BatchPayload!
-  updateManyNotificationGroups(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereInput!): BatchPayload!
-  updateManyNotifications(data: NotificationUpdateInput!, where: NotificationWhereInput!): BatchPayload!
-  updateManyContacts(data: ContactUpdateInput!, where: ContactWhereInput!): BatchPayload!
-  deleteManyFiles(where: FileWhereInput!): BatchPayload!
-  deleteManyUsers(where: UserWhereInput!): BatchPayload!
-  deleteManyConversations(where: ConversationWhereInput!): BatchPayload!
-  deleteManyMessages(where: MessageWhereInput!): BatchPayload!
-  deleteManyPendingMessages(where: PendingMessageWhereInput!): BatchPayload!
-  deleteManyNotificationGroups(where: NotificationGroupWhereInput!): BatchPayload!
-  deleteManyNotifications(where: NotificationWhereInput!): BatchPayload!
-  deleteManyContacts(where: ContactWhereInput!): BatchPayload!
+  updateManyFiles(data: FileUpdateInput!, where: FileWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  updateManyConversations(data: ConversationUpdateInput!, where: ConversationWhereInput): BatchPayload!
+  updateManyMessages(data: MessageUpdateInput!, where: MessageWhereInput): BatchPayload!
+  updateManyPendingMessages(data: PendingMessageUpdateInput!, where: PendingMessageWhereInput): BatchPayload!
+  updateManyNotificationGroups(data: NotificationGroupUpdateInput!, where: NotificationGroupWhereInput): BatchPayload!
+  updateManyNotifications(data: NotificationUpdateInput!, where: NotificationWhereInput): BatchPayload!
+  updateManyContacts(data: ContactUpdateInput!, where: ContactWhereInput): BatchPayload!
+  deleteManyFiles(where: FileWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
+  deleteManyConversations(where: ConversationWhereInput): BatchPayload!
+  deleteManyMessages(where: MessageWhereInput): BatchPayload!
+  deleteManyPendingMessages(where: PendingMessageWhereInput): BatchPayload!
+  deleteManyNotificationGroups(where: NotificationGroupWhereInput): BatchPayload!
+  deleteManyNotifications(where: NotificationWhereInput): BatchPayload!
+  deleteManyContacts(where: ContactWhereInput): BatchPayload!
 }
 
 enum MutationType {
