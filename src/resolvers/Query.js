@@ -7,6 +7,11 @@ const Query = {
     let conversation = await ctx.db.query.conversations( {where: { user: {id: userId} } })
     return conversation
   },
+
+  async allPendingMessages(parent,args,ctx,info){
+    const userId = getUserId(ctx)
+    return await ctx.db.query.pendingMessages({where: {user: {id: userId }}})
+  },
   
   async allMessagesSince(parent,args,ctx,info){
     const userId = getUserId(ctx)
@@ -22,6 +27,7 @@ const Query = {
     const id = getUserId(ctx)
     return ctx.db.query.user({ where: { id } }, info)
   },
+
 }
 
 module.exports = { Query }

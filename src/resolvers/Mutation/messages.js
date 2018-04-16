@@ -56,6 +56,7 @@ const messages = {
       }
     })
     pubsub.publish(userId+NEW_MESSAGE, {newMessage: message})
+    console.log("New Message sent to " + userId + " " +  JSON.stringify(message))
     if(pendingMessages && pendingMessages.length > 0){ // If there are duplicate messages with same body and address this will delete one as a time as they are sent
       await ctx.db.mutation.deletePendingMessage({ where:{ id: pendingMessages[0].id } })
     }
