@@ -5,8 +5,8 @@ service: slynql
 stage: ${env:PRISMA_STAGE}
 
 # to disable authentication:
-disableAuth: true
-#secret: ${env:PRISMA_SECRET}
+#disableAuth: true
+secret: ${env:PRISMA_SECRET}
 
 # the file path pointing to your data model
 datamodel: datamodel.graphql
@@ -15,5 +15,5 @@ datamodel: datamodel.graphql
 seed:
   import: seed.graphql
 
-cluster: local
-#scluster: public-razorhisser-124/prisma-us1
+#cluster: local
+cluster: public-razorhisser-124/prisma-us1

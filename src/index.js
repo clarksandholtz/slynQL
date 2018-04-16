@@ -45,14 +45,15 @@ server.express.post('/upload/image',  (req, res, next)=>{
     res.send("Name or Content Missing")
     return
   }
-  fs.writeFile(__dirname + "/../Images/"+ req.body.name, req.body.content, {encoding: 'base64'}, function(err) {
-    if(err){
-      console.log(err)
-    } else{
-      res.sendStatus(200)
-      db.mutation.updateFile({data: {uploaded: true}, where: {content: req.body.name}})
-    }
-  });
+  res.sendStatus(200);
+  // fs.writeFile(__dirname + "/../Images/"+ req.body.name, req.body.content, {encoding: 'base64'}, function(err) {
+  //   if(err){
+  //     console.log(err)
+  //   } else{
+  //     res.sendStatus(200)
+  //     db.mutation.updateFile({data: {uploaded: true}, where: {content: req.body.name}})
+  //   }
+  // });
   
 })
 
