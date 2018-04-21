@@ -26,6 +26,12 @@ const Query = {
     return contacts
   },
 
+  async allNotifications (parent, args, ctx, info) {
+    const userId = getUserId(ctx)
+    const notifications = await ctx.db.query.notifications({where: {user: {id: userId}}})
+    return notifications
+  },
+
   async me (parent, args, ctx, info) {
     const id = getUserId(ctx)
     return ctx.db.query.user({ where: { id } }, info)

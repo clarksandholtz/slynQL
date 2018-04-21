@@ -5,6 +5,7 @@ type Query {
   allPendingMessages: [PendingMessage!]
   allMessagesSince(timestamp: String!): [Message!]
   allContacts: [Contact!]
+  allNotifications: [Notification!]
   me: User
 }
 
