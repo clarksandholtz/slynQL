@@ -13,6 +13,7 @@ type Mutation {
   login(email: String!, uid: String!): AuthPayload!
 
   createMessage(androidMsgId: String!, sender: String!, address: String!, participants: [ContactCreateWithoutConversationInput!]!, userSent: Boolean!, body: String!, read: Boolean!, threadId: Int!, date: String!, error: Boolean!, files: [FileCreateInput]): Message!
+  createNotification(androidId: String!, appName: String!, ticker: String!, title: String!, text: String!, date: String!, canReply: Boolean) : Notification!
   sendMessage(address: String!, body: String!, file: FileCreateInput): PendingMessage
   updateMessage(id: ID!, read: Boolean, error: Boolean): Message!
   createMessages(messages: [ClientMessageCreateInput!]): StatusPayload!
@@ -31,6 +32,7 @@ type Subscription {
   syncComplete(token: String!) : StatusPayload
   newMessage(token: String!) : Message!
   markedAsRead(token: String!) : Conversation!
+  newNotification(token: String!) : Notification!
 }
 
 type AuthPayload {

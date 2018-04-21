@@ -15,5 +15,5 @@ datamodel: datamodel.graphql
 seed:
   import: seed.graphql
 
-#cluster: local
-cluster: public-razorhisser-124/prisma-us1
+cluster: local
+#cluster: gcloud

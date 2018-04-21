@@ -18,6 +18,7 @@ type User @model {
   phone: String! @unique
   conversations: [Conversation!]! @relation(name: "UsersConversation")
   pendingMessages: [PendingMessage!]! @relation(name: "UsersPendingMessages")
+  notifications: [Notification!]! @relation(name: "UsersNotifications")
   syncComplete: Boolean @default(value: "false")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -61,21 +62,16 @@ type PendingMessage @model {
   updatedAt: DateTime!
 }
 
-type NotificationGroup @model {
-  id: ID! @unique
-  notifications: [Notification!]! @relation(name: "NotificationsInGroup")
-  user: User @relation(name: "UsersNotificationGroup")
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type Notification @model {
   id: ID! @unique
-  error: Boolean!
-  body: String!
-  actions: [String!]!
   date: DateTime
-  notificationGroup: NotificationGroup @relation(name: "NotificationsInGroup")
+  androidId: String!
+  appName: String!
+  ticker: String!
+  title: String!
+  text: String!
+  canReply: Boolean!
+  user: User @relation(name: "UsersNotifications")
   createdAt: DateTime!
   updatedAt: DateTime!
 }

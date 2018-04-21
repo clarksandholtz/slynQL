@@ -4,6 +4,7 @@ const { messages } = require('./Mutation/messages')
 const { conversations } = require('./Mutation/conversations')
 const { AuthPayload } = require('./AuthPayload')
 const { Subscription } = require('./Subscription')
+const { notifications } = require('./Mutation/notifications')
 
 module.exports = {
   Query,
@@ -11,7 +12,8 @@ module.exports = {
     ...auth,
     ...messages,
     ...conversations,
+    ...notifications
   },
   Subscription,
-  AuthPayload,
+  AuthPayload
 }

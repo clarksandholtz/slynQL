@@ -2,31 +2,34 @@ const { getUserId } = require('../utils')
 
 const Query = {
 
-  async allConversations(parent, args, ctx, info) {
+  async allConversations (parent, args, ctx, info) {
     const userId = getUserId(ctx)
-    let conversation = await ctx.db.query.conversations( {where: { user: {id: userId} } })
+    let conversation = await ctx.db.query.conversations({ where: { user: {id: userId} } })
     return conversation
   },
 
-  async allPendingMessages(parent,args,ctx,info){
+  async allPendingMessages (parent, args, ctx, info) {
     const userId = getUserId(ctx)
-    return await ctx.db.query.pendingMessages({where: {user: {id: userId }}})
-  },
-  
-  async allMessagesSince(parent,args,ctx,info){
-    const userId = getUserId(ctx)
-    return await ctx.db.query.messages( {where: {date_gt: args.timestamp, user: {id: userId}}})
+    const pendingMessages = await ctx.db.query.pendingMessages({where: {user: {id: userId}}})
+    return pendingMessages
   },
 
-  async allContacts(parent,args,ctx,info){
+  async allMessagesSince (parent, args, ctx, info) {
     const userId = getUserId(ctx)
-    return await ctx.db.query.contacts( {where: {conversation: {user: {id: userId}}}})
+    const messages = await ctx.db.query.messages({where: {date_gt: args.timestamp, user: {id: userId}}})
+    return messages
   },
 
-  async me(parent, args, ctx, info) {
+  async allContacts (parent, args, ctx, info) {
+    const userId = getUserId(ctx)
+    const contacts = await ctx.db.query.contacts({where: {conversation: {user: {id: userId}}}})
+    return contacts
+  },
+
+  async me (parent, args, ctx, info) {
     const id = getUserId(ctx)
     return ctx.db.query.user({ where: { id } }, info)
-  },
+  }
 
 }
 
