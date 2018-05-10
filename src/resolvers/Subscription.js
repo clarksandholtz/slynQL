@@ -8,7 +8,8 @@ const Types = {
   newMessage: 'newMessage',
   syncComplete: 'syncComplete',
   markedAsRead: 'markedAsRead',
-  newNotification: 'newNotification'
+  newNotification: 'newNotification',
+  clearNotification: 'clearNotification'
 }
 
 const startSubscription = (type) => {
@@ -43,6 +44,9 @@ const Subscription = {
   },
   newNotification: {
     subscribe: startSubscription(Types.newNotification)
+  },
+  clearNotification: {
+    subscribe: startSubscription(Types.clearNotification)
   }
 }
 

@@ -22,6 +22,7 @@ type Mutation {
   markThreadAsRead(threadId: Int!): StatusPayload!
 
   deleteMessage(id: ID!): Message!
+  deleteNotification(id: ID!): Notification!
   deleteConversation(id: ID!): Conversation!
   deleteAllMessages: StatusPayload!
 
