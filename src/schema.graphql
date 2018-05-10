@@ -35,6 +35,7 @@ type Subscription {
   newMessage(token: String!) : Message!
   markedAsRead(token: String!) : Conversation!
   newNotification(token: String!) : Notification!
+  clearNotification(token: String!) : Notification!
 }
 
 type AuthPayload {
