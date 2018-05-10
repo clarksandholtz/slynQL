@@ -29,25 +29,14 @@ const publish = (userId, type, object) => {
   console.log(`Subscription of type ${type} fired to ${userId} with payload ${JSON.stringify(send)}`)
 }
 
-const Subscription = {
-  pendingMessages: {
-    subscribe: startSubscription(Types.pendingMessages)
-  },
-  syncComplete: {
-    subscribe: startSubscription(Types.syncComplete)
-  },
-  newMessage: {
-    subscribe: startSubscription(Types.newMessage)
-  },
-  markedAsRead: {
-    subscribe: startSubscription(Types.markedAsRead)
-  },
-  newNotification: {
-    subscribe: startSubscription(Types.newNotification)
-  },
-  clearNotification: {
-    subscribe: startSubscription(Types.clearNotification)
+const Subscription = () => {
+  let subscription = {}
+  for (let key in Types) {
+    subscription[key] = {
+      subscribe: startSubscription(Types[key])
+    }
   }
+  return subscription
 }
 
 module.exports = { Subscription, publish, Types }
