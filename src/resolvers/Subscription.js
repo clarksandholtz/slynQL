@@ -29,7 +29,7 @@ const publish = (userId, type, object) => {
   console.log(`Subscription of type ${type} fired to ${userId} with payload ${JSON.stringify(send)}`)
 }
 
-const Subscription = () => {
+const createSubscriptions = () => {
   let subscription = {}
   for (let key in Types) {
     subscription[key] = {
@@ -38,5 +38,7 @@ const Subscription = () => {
   }
   return subscription
 }
+
+const Subscription = createSubscriptions()
 
 module.exports = { Subscription, publish, Types }
