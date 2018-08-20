@@ -1,11 +1,4 @@
-# the name for the service (will be part of the service's HTTP endpoint)
-service: slynql
-
-# the cluster and stage the service is deployed to
-stage: ${env:PRISMA_STAGE}
-
-# to disable authentication:
-disableAuth: true
+# comment this out to turn off auth to docker container
 #secret: ${env:PRISMA_SECRET}
 
 # the file path pointing to your data model
@@ -15,5 +8,4 @@ datamodel: datamodel.graphql
 seed:
   import: seed.graphql
 
-cluster: local
-#cluster: gcloud
+endpoint: "http://localhost:4466/slynql/dev"

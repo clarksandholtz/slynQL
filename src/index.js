@@ -78,34 +78,3 @@ server.express.get('/download/image', (req, res, next) => {
 
 server.start({cacheControl: false}, () => console.log('Server is running on http://localhost:4000'))
 
-// Separate Websocket Port
-
-const { createServer } = require('http')
-const { SubscriptionServer } = require('subscriptions-transport-ws')
-const { execute, subscribe } = require('graphql')
-const schema = require('prisma-json-schema/dist/schema.json')
-
-const WS_PORT = 5000
-
-// Create WebSocket listener server
-const websocketServer = createServer((request, response) => {
-  response.writeHead(404)
-  response.end()
-})
-// Bind it to port and start listening
-websocketServer.listen(WS_PORT, () => console.log(
-  `Websocket Server is now running on http://localhost:${WS_PORT}`
-))
-
-// const subscriptionServer = SubscriptionServer.create(
-SubscriptionServer.create(
-  {
-    schema,
-    execute,
-    subscribe
-  },
-  {
-    server: websocketServer,
-    path: '/graphql'
-  }
-)

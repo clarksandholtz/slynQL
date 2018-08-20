@@ -15,7 +15,9 @@ const sortMessages = (a, b) => {
 const sortAll = (conversations) => {
   conversations.sort(sortConversations)
   conversations.forEach((conversation) => {
-    conversation.messages.sort(sortMessages)
+    if (conversation.messages) {
+      conversation.messages.sort(sortMessages)
+    }
   })
   return conversations
 }
@@ -27,6 +29,16 @@ const Query = {
     let conversations = await ctx.db.query.conversations({ where: { user: {id: userId} }, orderBy: 'updatedAt_ASC' }, info)
     conversations = sortAll(conversations)
     return conversations
+  },
+
+  async conversation (parent, args, ctx, info) {
+    const userId = getUserId(ctx)
+    const conversations = await ctx.db.query.conversations({ where: { user: {id: userId}, threadId: args.threadId } }, info)
+    let conversation = conversations[0]
+    if (conversation.messages) {
+      conversation.messages.sort(sortMessages)
+    }
+    return conversation
   },
 
   async allPendingMessages (parent, args, ctx, info) {
@@ -56,7 +68,9 @@ const Query = {
   async me (parent, args, ctx, info) {
     const id = getUserId(ctx)
     let user = ctx.db.query.user({ where: { id } }, info)
-    user.conversations = sortAll(user.conversations)
+    if (user.conversations) {
+      user.conversations = sortAll(user.conversations)
+    }
     return user
   }
 

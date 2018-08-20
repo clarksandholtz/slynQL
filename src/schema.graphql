@@ -2,6 +2,7 @@
 
 type Query {
   allConversations: [Conversation]
+  conversation: Conversation!
   allPendingMessages: [PendingMessage!]
   allMessagesSince(timestamp: String!): [Message!]
   allContacts: [Contact!]
